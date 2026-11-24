@@ -1,14 +1,15 @@
 /**
- * Pinkie Pie Y2K Live Wallpaper - Mane 6 Party Edition (v2.0)
- * High-performance, zero-dependency interactive wallpaper.
- * Compatible with Lively Wallpaper & Wallpaper Engine.
+ * Pinkie Pie & Mane 6 Y2K Party Live Wallpaper (v3.0 Production Edition)
+ * Native Lively Wallpaper & Wallpaper Engine compatible.
+ * Procedural Web Audio API, Hardware Monitor, Audio Visualizer,
+ * Vector Face Rig, Parallax Gaze Tracking & Daily Y2K Widgets.
  */
 
 (function () {
   'use strict';
 
   /* ==========================================================================
-     1. SoundFX Module (Procedural Web Audio API - Zero External Files)
+     1. SoundFX Module (Procedural Web Audio API - Zero External Dependencies)
      ========================================================================== */
 
   class SoundFXController {
@@ -18,13 +19,11 @@
       this.isMuted = false;
       this.isUnlocked = false;
 
-      // Check saved mute preference
       const savedMute = localStorage.getItem('pinkie_y2k_muted');
       if (savedMute !== null) {
         this.isMuted = savedMute === 'true';
       }
 
-      // Unlock on first user gesture
       const unlock = () => {
         this.init();
         window.removeEventListener('pointerdown', unlock);
@@ -61,7 +60,7 @@
       return this.isMuted;
     }
 
-    /** Cute bubbly upward pitch-sweep sine/triangle wave (350Hz -> 780Hz, ~90ms) */
+    /** Cute bubbly upward pitch-sweep sine wave (350Hz -> 780Hz) */
     playStickerPop() {
       if (this.isMuted || !this.ctx) return;
       if (this.ctx.state === 'suspended') this.ctx.resume();
@@ -93,7 +92,6 @@
         if (this.ctx.state === 'suspended') this.ctx.resume();
 
         const now = this.ctx.currentTime;
-        // Tone 1: D5 (587.33 Hz)
         const osc1 = this.ctx.createOscillator();
         const gain1 = this.ctx.createGain();
         osc1.type = 'triangle';
@@ -105,7 +103,6 @@
         osc1.start(now);
         osc1.stop(now + 0.15);
 
-        // Tone 2: A5 (880.00 Hz)
         const osc2 = this.ctx.createOscillator();
         const gain2 = this.ctx.createGain();
         osc2.type = 'triangle';
@@ -120,14 +117,12 @@
       }, delayMs);
     }
 
-    /** Crisp mechanical retro switch click + soft downward pop (620Hz -> 310Hz) */
+    /** Crisp mechanical retro switch click + soft downward pop */
     playWindowClose() {
       if (this.isMuted || !this.ctx) return;
       if (this.ctx.state === 'suspended') this.ctx.resume();
 
       const now = this.ctx.currentTime;
-
-      // Mechanical click pulse
       const oscClick = this.ctx.createOscillator();
       const gainClick = this.ctx.createGain();
       oscClick.type = 'square';
@@ -139,7 +134,6 @@
       oscClick.start(now);
       oscClick.stop(now + 0.025);
 
-      // Downward pop
       const oscPop = this.ctx.createOscillator();
       const gainPop = this.ctx.createGain();
       oscPop.type = 'sine';
@@ -153,192 +147,374 @@
       oscPop.stop(now + 0.09);
     }
 
-    /** Gentle major-triad arpeggio chime on loop reset */
+    /** Reset sparkle chime sweep */
     playResetSparkle() {
       if (this.isMuted || !this.ctx) return;
       if (this.ctx.state === 'suspended') this.ctx.resume();
 
-      const notes = [1046.5, 1318.5, 1567.98, 2093.0]; // C6, E6, G6, C7
+      const baseNow = this.ctx.currentTime;
+      const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51, 1567.98];
       notes.forEach((freq, idx) => {
-        const startTime = this.ctx.currentTime + idx * 0.065;
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
+        const noteStart = baseNow + idx * 0.055;
 
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, startTime);
-
-        gain.gain.setValueAtTime(0, startTime);
-        gain.gain.linearRampToValueAtTime(0.35, startTime + 0.015);
-        gain.gain.exponentialRampToValueAtTime(0.0005, startTime + 0.45);
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, noteStart);
+        gain.gain.setValueAtTime(0, noteStart);
+        gain.gain.linearRampToValueAtTime(0.25, noteStart + 0.015);
+        gain.gain.exponentialRampToValueAtTime(0.001, noteStart + 0.22);
 
         osc.connect(gain);
         gain.connect(this.masterGain);
-
-        osc.start(startTime);
-        osc.stop(startTime + 0.5);
+        osc.start(noteStart);
+        osc.stop(noteStart + 0.25);
       });
     }
 
-    /** 1. Rainbow Dash SFX: High-speed whoosh + sonic boom sweep */
-    playRainbowDashSFX() {
+    /** Party Cannon Confetti Boom + Whistle */
+    playCannonBoom() {
       if (this.isMuted || !this.ctx) return;
       if (this.ctx.state === 'suspended') this.ctx.resume();
 
       const now = this.ctx.currentTime;
-      // High-speed whoosh
-      const oscWhoosh = this.ctx.createOscillator();
-      const gainWhoosh = this.ctx.createGain();
-      oscWhoosh.type = 'sawtooth';
-      oscWhoosh.frequency.setValueAtTime(240, now);
-      oscWhoosh.frequency.exponentialRampToValueAtTime(1200, now + 0.25);
-      oscWhoosh.frequency.exponentialRampToValueAtTime(90, now + 0.75);
+      // Low bass impact
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(140, now);
+      osc.frequency.exponentialRampToValueAtTime(38, now + 0.25);
+      gain.gain.setValueAtTime(0.6, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+      osc.connect(gain);
+      gain.connect(this.masterGain);
+      osc.start(now);
+      osc.stop(now + 0.3);
 
-      gainWhoosh.gain.setValueAtTime(0, now);
-      gainWhoosh.gain.linearRampToValueAtTime(0.35, now + 0.22);
-      gainWhoosh.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
-
-      oscWhoosh.connect(gainWhoosh);
-      gainWhoosh.connect(this.masterGain);
-      oscWhoosh.start(now);
-      oscWhoosh.stop(now + 0.85);
-
-      // Low shockwave boom
-      const oscBoom = this.ctx.createOscillator();
-      const gainBoom = this.ctx.createGain();
-      oscBoom.type = 'triangle';
-      oscBoom.frequency.setValueAtTime(140, now + 0.2);
-      oscBoom.frequency.exponentialRampToValueAtTime(45, now + 0.75);
-
-      gainBoom.gain.setValueAtTime(0, now + 0.2);
-      gainBoom.gain.linearRampToValueAtTime(0.45, now + 0.23);
-      gainBoom.gain.exponentialRampToValueAtTime(0.001, now + 0.85);
-
-      oscBoom.connect(gainBoom);
-      gainBoom.connect(this.masterGain);
-      oscBoom.start(now + 0.2);
-      oscBoom.stop(now + 0.9);
+      // Party whistle sweep
+      const whistle = this.ctx.createOscillator();
+      const wGain = this.ctx.createGain();
+      whistle.type = 'sine';
+      whistle.frequency.setValueAtTime(440, now + 0.05);
+      whistle.frequency.exponentialRampToValueAtTime(1320, now + 0.28);
+      wGain.gain.setValueAtTime(0.01, now + 0.05);
+      wGain.gain.linearRampToValueAtTime(0.3, now + 0.12);
+      wGain.gain.exponentialRampToValueAtTime(0.001, now + 0.32);
+      whistle.connect(wGain);
+      wGain.connect(this.masterGain);
+      whistle.start(now + 0.05);
+      whistle.stop(now + 0.35);
     }
 
-    /** 2. Twilight Sparkle SFX: Mystical shimmering arpeggio chord */
+    /** Elements of Harmony Polyphonic Victory Chord */
+    playHarmonyChord() {
+      if (this.isMuted || !this.ctx) return;
+      if (this.ctx.state === 'suspended') this.ctx.resume();
+
+      const now = this.ctx.currentTime;
+      // Majestic chord: C5 (523.25), E5 (659.25), G5 (783.99), B5 (987.77), D6 (1174.66)
+      const freqs = [523.25, 659.25, 783.99, 987.77, 1174.66, 1567.98];
+      freqs.forEach((f, i) => {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = i % 2 === 0 ? 'triangle' : 'sine';
+        osc.frequency.setValueAtTime(f, now + i * 0.04);
+        gain.gain.setValueAtTime(0.01, now + i * 0.04);
+        gain.gain.linearRampToValueAtTime(0.2, now + i * 0.04 + 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.8);
+        osc.connect(gain);
+        gain.connect(this.masterGain);
+        osc.start(now + i * 0.04);
+        osc.stop(now + 1.9);
+      });
+    }
+
+    /** Pony Switcher Chime */
+    playPonySwitchChime(ponyId) {
+      if (this.isMuted || !this.ctx) return;
+      if (this.ctx.state === 'suspended') this.ctx.resume();
+
+      const now = this.ctx.currentTime;
+      const pitches = {
+        pinkie: [587, 880],
+        twilight: [440, 660, 880],
+        rainbow: [784, 1174],
+        fluttershy: [659, 784],
+        rarity: [698, 1046],
+        applejack: [392, 587]
+      };
+      const sequence = pitches[ponyId] || [523, 784];
+      sequence.forEach((freq, idx) => {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+        gain.gain.setValueAtTime(0.25, now + idx * 0.08);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.2);
+        osc.connect(gain);
+        gain.connect(this.masterGain);
+        osc.start(now + idx * 0.08);
+        osc.stop(now + idx * 0.08 + 0.22);
+      });
+    }
+
+    playRainbowDashSFX() {
+      if (this.isMuted || !this.ctx) return;
+      if (this.ctx.state === 'suspended') this.ctx.resume();
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(150, now);
+      osc.frequency.exponentialRampToValueAtTime(1200, now + 0.35);
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+      osc.connect(gain);
+      gain.connect(this.masterGain);
+      osc.start(now);
+      osc.stop(now + 0.5);
+    }
+
     playTwilightSFX() {
       if (this.isMuted || !this.ctx) return;
       if (this.ctx.state === 'suspended') this.ctx.resume();
-
-      const notes = [587.33, 739.99, 880.0, 1108.73, 1318.51, 1760.0]; // D5, F#5, A5, C#6, E6, A6 (Mystical maj9)
-      notes.forEach((freq, idx) => {
-        const startTime = this.ctx.currentTime + idx * 0.055;
+      const now = this.ctx.currentTime;
+      [440, 554, 659, 880, 1108].forEach((f, idx) => {
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
-
         osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, startTime);
-
-        gain.gain.setValueAtTime(0, startTime);
-        gain.gain.linearRampToValueAtTime(0.28, startTime + 0.02);
-        gain.gain.exponentialRampToValueAtTime(0.0008, startTime + 0.55);
-
+        osc.frequency.setValueAtTime(f, now + idx * 0.05);
+        gain.gain.setValueAtTime(0.2, now + idx * 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.05 + 0.25);
         osc.connect(gain);
         gain.connect(this.masterGain);
-        osc.start(startTime);
-        osc.stop(startTime + 0.6);
+        osc.start(now + idx * 0.05);
+        osc.stop(now + idx * 0.05 + 0.28);
       });
     }
 
-    /** 3. Fluttershy SFX: Soft fluttery melodic harp/windchime cascade */
     playFluttershySFX() {
       if (this.isMuted || !this.ctx) return;
       if (this.ctx.state === 'suspended') this.ctx.resume();
-
-      const melody = [523.25, 659.25, 783.99, 987.77, 1046.5, 1318.51]; // C5, E5, G5, B5, C6, E6
-      melody.forEach((freq, idx) => {
-        const startTime = this.ctx.currentTime + idx * 0.08;
+      const now = this.ctx.currentTime;
+      [587, 659, 784, 880].forEach((f, idx) => {
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
-
         osc.type = 'triangle';
-        osc.frequency.setValueAtTime(freq, startTime);
-
-        gain.gain.setValueAtTime(0, startTime);
-        gain.gain.linearRampToValueAtTime(0.25, startTime + 0.025);
-        gain.gain.exponentialRampToValueAtTime(0.0005, startTime + 0.65);
-
+        osc.frequency.setValueAtTime(f, now + idx * 0.07);
+        gain.gain.setValueAtTime(0.18, now + idx * 0.07);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.07 + 0.3);
         osc.connect(gain);
         gain.connect(this.masterGain);
-        osc.start(startTime);
-        osc.stop(startTime + 0.7);
+        osc.start(now + idx * 0.07);
+        osc.stop(now + idx * 0.07 + 0.35);
       });
     }
 
-    /** 4. Rarity SFX: Crystalline chime cascade with bright bell tinkles */
     playRaritySFX() {
       if (this.isMuted || !this.ctx) return;
       if (this.ctx.state === 'suspended') this.ctx.resume();
-
-      const bells = [1760.0, 2093.0, 2637.0, 3135.96, 3520.0]; // A6, C7, E7, G7, A7
-      bells.forEach((freq, idx) => {
-        const startTime = this.ctx.currentTime + idx * 0.07;
+      const now = this.ctx.currentTime;
+      [880, 1174, 1396, 1760].forEach((f, idx) => {
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
-
         osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, startTime);
-
-        gain.gain.setValueAtTime(0, startTime);
-        gain.gain.linearRampToValueAtTime(0.22, startTime + 0.01);
-        gain.gain.exponentialRampToValueAtTime(0.0003, startTime + 0.5);
-
+        osc.frequency.setValueAtTime(f, now + idx * 0.06);
+        gain.gain.setValueAtTime(0.2, now + idx * 0.06);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.06 + 0.22);
         osc.connect(gain);
         gain.connect(this.masterGain);
-        osc.start(startTime);
-        osc.stop(startTime + 0.55);
+        osc.start(now + idx * 0.06);
+        osc.stop(now + idx * 0.06 + 0.25);
       });
     }
 
-    /** 5. Applejack SFX: Rustic percussion pops / bouncy retro bass plucks */
     playApplejackSFX() {
       if (this.isMuted || !this.ctx) return;
       if (this.ctx.state === 'suspended') this.ctx.resume();
-
-      const pops = [220, 293.66, 369.99, 440, 220]; // A3, D4, F#4, A4, A3
-      pops.forEach((freq, idx) => {
-        const startTime = this.ctx.currentTime + idx * 0.11;
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(freq, startTime);
-        osc.frequency.exponentialRampToValueAtTime(freq * 0.5, startTime + 0.09);
-
-        gain.gain.setValueAtTime(0, startTime);
-        gain.gain.linearRampToValueAtTime(0.35, startTime + 0.015);
-        gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.1);
-
-        osc.connect(gain);
-        gain.connect(this.masterGain);
-        osc.start(startTime);
-        osc.stop(startTime + 0.12);
-      });
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(260, now);
+      osc.frequency.exponentialRampToValueAtTime(130, now + 0.12);
+      gain.gain.setValueAtTime(0.4, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+      osc.connect(gain);
+      gain.connect(this.masterGain);
+      osc.start(now);
+      osc.stop(now + 0.16);
     }
   }
 
   const soundFX = new SoundFXController();
 
   /* ==========================================================================
-     2. Custom Retro Pixel Cursor & Sparkle Particles
+     2. Milestone 1: Static Character Palettes & Configurations
+     ========================================================================== */
+
+  const MANE_6_CHARACTERS = {
+    pinkie: {
+      id: 'pinkie',
+      name: 'Pinkie Pie',
+      coatColor: '#F6B2D1',
+      eyeColor: '#4792B3',
+      blushColor: '#FF4F93',
+      file: 'assets/pinkie-idle.png',
+      cmFile: 'assets/cm-pinkie.png',
+      rig: {
+        leftEye: { cx: 29.5, cy: 48.5, rx: 9.5, ry: 10.2 },
+        rightEye: { cx: 64.5, cy: 48.5, rx: 9.5, ry: 10.2 },
+        blushLeft: { cx: 22.5, cy: 57.5, rx: 6.8, ry: 3.8 },
+        blushRight: { cx: 69.5, cy: 57.5, rx: 6.8, ry: 3.8 }
+      }
+    },
+    twilight: {
+      id: 'twilight',
+      name: 'Twilight Sparkle',
+      coatColor: '#D19FE8',
+      eyeColor: '#662D91',
+      blushColor: '#C2185B',
+      file: 'assets/twilight.png',
+      cmFile: 'assets/cm-twilight.png',
+      rig: {
+        leftEye: { cx: 34.0, cy: 45.0, rx: 9.0, ry: 9.8 },
+        rightEye: { cx: 66.0, cy: 45.0, rx: 9.0, ry: 9.8 },
+        blushLeft: { cx: 27.0, cy: 54.0, rx: 6.0, ry: 3.5 },
+        blushRight: { cx: 72.0, cy: 54.0, rx: 6.0, ry: 3.5 }
+      }
+    },
+    rainbow: {
+      id: 'rainbow',
+      name: 'Rainbow Dash',
+      coatColor: '#A0D7F7',
+      eyeColor: '#BF1868',
+      blushColor: '#FF5252',
+      file: 'assets/rainbow.png',
+      cmFile: 'assets/cm-rainbow.png',
+      rig: {
+        leftEye: { cx: 32.0, cy: 46.0, rx: 9.2, ry: 10.0 },
+        rightEye: { cx: 65.0, cy: 46.0, rx: 9.2, ry: 10.0 },
+        blushLeft: { cx: 25.0, cy: 55.0, rx: 6.5, ry: 3.6 },
+        blushRight: { cx: 70.0, cy: 55.0, rx: 6.5, ry: 3.6 }
+      }
+    },
+    fluttershy: {
+      id: 'fluttershy',
+      name: 'Fluttershy',
+      coatColor: '#FDF6AF',
+      eyeColor: '#39B54A',
+      blushColor: '#F48FB1',
+      file: 'assets/fluttershy.png',
+      cmFile: 'assets/cm-fluttershy.png',
+      rig: {
+        leftEye: { cx: 31.0, cy: 47.0, rx: 9.5, ry: 10.2 },
+        rightEye: { cx: 64.0, cy: 47.0, rx: 9.5, ry: 10.2 },
+        blushLeft: { cx: 24.0, cy: 56.0, rx: 6.8, ry: 3.8 },
+        blushRight: { cx: 69.0, cy: 56.0, rx: 6.8, ry: 3.8 }
+      }
+    },
+    rarity: {
+      id: 'rarity',
+      name: 'Rarity',
+      coatColor: '#F4F3F8',
+      eyeColor: '#2E3192',
+      blushColor: '#9575CD',
+      file: 'assets/rarity.png',
+      cmFile: 'assets/cm-rarity.png',
+      rig: {
+        leftEye: { cx: 36.0, cy: 46.5, rx: 8.8, ry: 9.8 },
+        rightEye: { cx: 63.5, cy: 46.5, rx: 8.8, ry: 9.8 },
+        blushLeft: { cx: 30.0, cy: 55.0, rx: 6.2, ry: 3.5 },
+        blushRight: { cx: 68.0, cy: 55.0, rx: 6.2, ry: 3.5 }
+      }
+    },
+    applejack: {
+      id: 'applejack',
+      name: 'Applejack',
+      coatColor: '#FDB953',
+      eyeColor: '#4A993D',
+      blushColor: '#FF7043',
+      file: 'assets/applejack.png',
+      cmFile: 'assets/cm-applejack.png',
+      rig: {
+        leftEye: { cx: 33.0, cy: 47.0, rx: 9.5, ry: 10.0 },
+        rightEye: { cx: 65.5, cy: 47.0, rx: 9.5, ry: 10.0 },
+        blushLeft: { cx: 26.0, cy: 56.0, rx: 6.8, ry: 3.8 },
+        blushRight: { cx: 71.0, cy: 56.0, rx: 6.8, ry: 3.8 }
+      }
+    }
+  };
+
+  let currentCharacterId = 'pinkie';
+
+  /* ==========================================================================
+     3. Global State & Lively Playback Control
+     ========================================================================== */
+
+  let isPaused = false;
+  let isChillMode = localStorage.getItem('pony_wallpaper_mode') === 'chill';
+  let popupStickerThreshold = 7;
+  let animFrameId = null;
+
+  function updatePlaybackPause(shouldPause) {
+    isPaused = shouldPause;
+    if (isPaused) {
+      if (animFrameId) {
+        cancelAnimationFrame(animFrameId);
+        animFrameId = null;
+      }
+      if (soundFX.ctx && soundFX.ctx.state === 'running') {
+        soundFX.ctx.suspend();
+      }
+    } else {
+      if (soundFX.ctx && soundFX.ctx.state === 'suspended' && soundFX.isUnlocked) {
+        soundFX.ctx.resume();
+      }
+      if (!animFrameId) {
+        animFrameId = requestAnimationFrame(renderLoop);
+      }
+    }
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    updatePlaybackPause(document.hidden);
+  });
+
+  window.livelyWallpaperPlaybackChanged = function (data) {
+    if (data && typeof data.isPaused !== 'undefined') {
+      updatePlaybackPause(Boolean(data.isPaused));
+    }
+  };
+
+  /* ==========================================================================
+     4. Custom Y2K Pixel Cursor & Click Particles
      ========================================================================== */
 
   const cursorEl = document.getElementById('retro-cursor');
   const sparkleContainer = document.getElementById('sparkle-container');
   const rippleContainer = document.getElementById('ripple-container');
 
-  let lastSparkleTime = 0;
   let mouseX = window.innerWidth / 2;
   let mouseY = window.innerHeight / 2;
+  let lastSparkleTime = 0;
+
+  // Parallax Gaze Tracking Targets & Smooth Lerp
+  let targetParallaxX = 0;
+  let targetParallaxY = 0;
+  let currentParallaxX = 0;
+  let currentParallaxY = 0;
 
   window.addEventListener('pointermove', (e) => {
     mouseX = e.clientX;
     mouseY = e.clientY;
     cursorEl.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
+
+    // Calculate normalized cursor offset from screen center (-1.0 to 1.0)
+    const cx = window.innerWidth / 2;
+    const cy = window.innerHeight / 2;
+    targetParallaxX = (mouseX - cx) / cx;
+    targetParallaxY = (mouseY - cy) / cy;
 
     const now = performance.now();
     if (now - lastSparkleTime > 32) {
@@ -350,7 +526,6 @@
   function spawnMouseSparkle(x, y) {
     const sparkle = document.createElement('div');
     sparkle.className = 'mouse-sparkle';
-
     const jx = (Math.random() - 0.5) * 14;
     const jy = (Math.random() - 0.5) * 14;
     sparkle.style.left = `${x + jx}px`;
@@ -365,7 +540,6 @@
         <path d="M12 0 Q12 12 24 12 Q12 12 12 24 Q12 12 0 12 Q12 12 12 0 Z" fill="${color}" />
       </svg>
     `;
-
     sparkleContainer.appendChild(sparkle);
     setTimeout(() => sparkle.remove(), 650);
   }
@@ -380,66 +554,91 @@
   }
 
   /* ==========================================================================
-     3. Layer 1: Starfield Background Canvas
+     5. Milestone 1: Offscreen Star Cache & GPU Starfield Canvas
      ========================================================================== */
 
-  const canvas = document.getElementById('starfield-canvas');
-  const ctx = canvas.getContext('2d');
+  const starCanvas = document.getElementById('starfield-canvas');
+  const starCtx = starCanvas.getContext('2d');
   let stars = [];
-  const STAR_COUNT = 42;
+  let starDensity = 42;
+  const starSpriteCache = {};
 
-  function resizeCanvas() {
+  const STAR_PALETTE = ['#FFFFFF', '#FFD6E7', '#FFB5D3', '#FFA8CE', '#FFE5F1', '#E1BEE7', '#B3E5FC'];
+  const STAR_SIZES = [4, 7, 10, 13];
+
+  function preRenderStarCache() {
+    STAR_PALETTE.forEach((color) => {
+      [4, 5].forEach((spikes) => {
+        STAR_SIZES.forEach((sz) => {
+          const key = `${color}_${spikes}_${sz}`;
+          const pad = 12;
+          const w = sz * 2 + pad * 2;
+          const h = sz * 2 + pad * 2;
+
+          const off = document.createElement('canvas');
+          off.width = w;
+          off.height = h;
+          const oCtx = off.getContext('2d');
+
+          oCtx.translate(w / 2, h / 2);
+          oCtx.beginPath();
+          const step = Math.PI / spikes;
+          const outerR = sz;
+          const innerR = sz * 0.42;
+
+          for (let i = 0; i < spikes * 2; i++) {
+            const r = i % 2 === 0 ? outerR : innerR;
+            const x = Math.cos(i * step) * r;
+            const y = Math.sin(i * step) * r;
+            if (i === 0) oCtx.moveTo(x, y);
+            else oCtx.lineTo(x, y);
+          }
+          oCtx.closePath();
+          oCtx.fillStyle = color;
+          oCtx.shadowColor = 'rgba(255, 181, 211, 0.7)';
+          oCtx.shadowBlur = 6;
+          oCtx.fill();
+
+          starSpriteCache[key] = {
+            canvas: off,
+            halfW: w / 2,
+            halfH: h / 2
+          };
+        });
+      });
+    });
+  }
+
+  function resizeStarCanvas() {
     const dpr = window.devicePixelRatio || 1;
-    canvas.width = window.innerWidth * dpr;
-    canvas.height = window.innerHeight * dpr;
-    ctx.scale(dpr, dpr);
+    starCanvas.width = window.innerWidth * dpr;
+    starCanvas.height = window.innerHeight * dpr;
+    starCtx.scale(dpr, dpr);
     initStars();
   }
 
   function initStars() {
     stars = [];
-    const colors = ['#FFFFFF', '#FFD6E7', '#FFB5D3', '#FFA8CE', '#FFE5F1', '#E1BEE7', '#B3E5FC'];
-    for (let i = 0; i < STAR_COUNT; i++) {
+    for (let i = 0; i < starDensity; i++) {
+      const spikes = Math.random() > 0.4 ? 4 : 5;
+      const szIdx = Math.floor(Math.random() * STAR_SIZES.length);
+      const sz = STAR_SIZES[szIdx];
+      const color = STAR_PALETTE[Math.floor(Math.random() * STAR_PALETTE.length)];
       stars.push({
         x: Math.random() * window.innerWidth,
         y: Math.random() * window.innerHeight,
-        size: 3 + Math.random() * 8,
         speedX: -0.2 - Math.random() * 0.4,
         speedY: 0.1 + Math.random() * 0.35,
         rotation: Math.random() * Math.PI * 2,
         rotSpeed: (Math.random() - 0.5) * 0.02,
-        color: colors[Math.floor(Math.random() * colors.length)],
-        alpha: 0.3 + Math.random() * 0.6,
-        points: Math.random() > 0.4 ? 4 : 5
+        alpha: 0.35 + Math.random() * 0.65,
+        cacheKey: `${color}_${spikes}_${sz}`
       });
     }
   }
 
-  function drawStar(cx, cy, spikes, outerRadius, innerRadius, fill, alpha, rot) {
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.rotate(rot);
-    ctx.beginPath();
-    const step = Math.PI / spikes;
-    for (let i = 0; i < spikes * 2; i++) {
-      const r = i % 2 === 0 ? outerRadius : innerRadius;
-      const x = Math.cos(i * step) * r;
-      const y = Math.sin(i * step) * r;
-      if (i === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
-    }
-    ctx.closePath();
-    ctx.globalAlpha = alpha;
-    ctx.fillStyle = fill;
-    ctx.shadowColor = 'rgba(255, 181, 211, 0.6)';
-    ctx.shadowBlur = 6;
-    ctx.fill();
-    ctx.restore();
-  }
-
   function renderStars() {
-    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-
+    starCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
     for (let i = 0; i < stars.length; i++) {
       const s = stars[i];
       s.x += s.speedX;
@@ -449,266 +648,99 @@
       if (s.x < -20) s.x = window.innerWidth + 20;
       if (s.y > window.innerHeight + 20) s.y = -20;
 
-      const inner = s.size * 0.42;
-      drawStar(s.x, s.y, s.points, s.size, inner, s.color, s.alpha, s.rotation);
+      const sprite = starSpriteCache[s.cacheKey];
+      if (sprite) {
+        starCtx.save();
+        starCtx.translate(s.x, s.y);
+        starCtx.rotate(s.rotation);
+        starCtx.globalAlpha = s.alpha;
+        starCtx.drawImage(sprite.canvas, -sprite.halfW, -sprite.halfH);
+        starCtx.restore();
+      }
     }
-    requestAnimationFrame(renderStars);
   }
 
-  window.addEventListener('resize', resizeCanvas);
-  resizeCanvas();
-  renderStars();
-
   /* ==========================================================================
-     4. Bulletproof Fallback SVGs for Mane 6 & Cutie Marks
-     ========================================================================== */
-
-  const SVG_FALLBACKS = {
-    // Original Y2K Stickers
-    bone: `
-      <svg viewBox="0 0 100 100" width="100%" height="100%">
-        <path d="M 28 42 L 72 42 Q 78 42 78 48 L 78 52 Q 78 58 72 58 L 28 58 Q 22 58 22 52 L 22 48 Q 22 42 28 42 Z" fill="#FFFFFF" stroke="#2B1425" stroke-width="4.5"/>
-        <circle cx="25" cy="40" r="14" fill="#FFFFFF" stroke="#2B1425" stroke-width="4.5"/>
-        <circle cx="25" cy="60" r="14" fill="#FFFFFF" stroke="#2B1425" stroke-width="4.5"/>
-        <circle cx="75" cy="40" r="14" fill="#FFFFFF" stroke="#2B1425" stroke-width="4.5"/>
-        <circle cx="75" cy="60" r="14" fill="#FFFFFF" stroke="#2B1425" stroke-width="4.5"/>
-      </svg>
-    `,
-    star: `
-      <svg viewBox="0 0 100 100" width="100%" height="100%">
-        <polygon points="50,5 64,36 98,36 70,57 81,91 50,70 19,91 30,57 2,36 36,36" fill="#FFE55C" stroke="#FF9D00" stroke-width="5" stroke-linejoin="round"/>
-        <polygon points="48,15 58,38 82,38 62,54 70,78 48,63 26,78 34,54 14,38 38,38" fill="#FFF7A8" />
-      </svg>
-    `,
-    swirl: `
-      <svg viewBox="0 0 100 100" width="100%" height="100%">
-        <path d="M 50 50 m 0 -5 a 5 5 0 0 1 10 5 a 10 10 0 0 1 -20 0 a 16 16 0 0 1 32 0 a 24 24 0 0 1 -48 0 a 32 32 0 0 1 64 0" fill="none" stroke="#2B1425" stroke-width="9" stroke-linecap="round"/>
-        <path d="M 50 50 m 0 -5 a 5 5 0 0 1 10 5 a 10 10 0 0 1 -20 0 a 16 16 0 0 1 32 0 a 24 24 0 0 1 -48 0 a 32 32 0 0 1 64 0" fill="none" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round"/>
-      </svg>
-    `,
-    cat: `
-      <svg viewBox="0 0 100 100" width="100%" height="100%">
-        <polygon points="24,52 30,22 50,42" fill="#FFFFFF" stroke="#2B1425" stroke-width="4.5"/>
-        <polygon points="76,52 70,22 50,42" fill="#FFFFFF" stroke="#2B1425" stroke-width="4.5"/>
-        <ellipse cx="50" cy="58" rx="38" ry="32" fill="#FFFFFF" stroke="#2B1425" stroke-width="4.5"/>
-        <circle cx="36" cy="56" r="4.5" fill="#2B1425"/>
-        <circle cx="64" cy="56" r="4.5" fill="#2B1425"/>
-        <polygon points="48,62 52,62 50,65" fill="#FF739D"/>
-      </svg>
-    `,
-    bow: `
-      <svg viewBox="0 0 100 100" width="100%" height="100%">
-        <ellipse cx="30" cy="50" rx="20" ry="14" fill="#FF85B3" stroke="#2B1425" stroke-width="3.5" transform="rotate(-15 30 50)"/>
-        <ellipse cx="70" cy="50" rx="20" ry="14" fill="#FF85B3" stroke="#2B1425" stroke-width="3.5" transform="rotate(15 70 50)"/>
-        <circle cx="50" cy="50" r="10" fill="#FFA8CB" stroke="#2B1425" stroke-width="3.5"/>
-      </svg>
-    `,
-    heart: `
-      <svg viewBox="0 0 100 100" width="100%" height="100%">
-        <path d="M 50 82 C 15 55 10 25 32 18 C 42 15 48 22 50 26 C 52 22 58 15 68 18 C 90 25 85 55 50 82 Z" fill="#FF6FA0" stroke="#2B1425" stroke-width="4.5"/>
-        <path d="M 50 74 C 22 51 18 29 35 23 C 43 21 48 27 50 30 C 52 27 57 21 65 23 C 82 29 78 51 50 74 Z" fill="#FFB0CE"/>
-      </svg>
-    `,
-
-    // Cutie Mark Stickers
-    'cm-pinkie': `
-      <svg viewBox="0 0 100 100" width="100%" height="100%">
-        <!-- 3 Balloons: 2 Blue, 1 Yellow -->
-        <ellipse cx="38" cy="40" rx="14" ry="18" fill="#40C4FF" stroke="#0091EA" stroke-width="2.5"/>
-        <ellipse cx="62" cy="40" rx="14" ry="18" fill="#40C4FF" stroke="#0091EA" stroke-width="2.5"/>
-        <ellipse cx="50" cy="56" rx="14" ry="18" fill="#FFEB3B" stroke="#FBC02D" stroke-width="2.5"/>
-        <path d="M 38 58 Q 36 74 44 86" fill="none" stroke="#607D8B" stroke-width="2" stroke-linecap="round"/>
-        <path d="M 62 58 Q 64 74 56 86" fill="none" stroke="#607D8B" stroke-width="2" stroke-linecap="round"/>
-        <path d="M 50 74 Q 48 82 52 90" fill="none" stroke="#607D8B" stroke-width="2" stroke-linecap="round"/>
-      </svg>
-    `,
-    'cm-twilight': `
-      <svg viewBox="0 0 100 100" width="100%" height="100%">
-        <!-- 6-pointed Magenta Star + 5 White Sparkles -->
-        <polygon points="50,15 57,38 78,35 64,52 75,70 50,60 25,70 36,52 22,35 43,38" fill="#E91E63" stroke="#880E4F" stroke-width="2.5"/>
-        <polygon points="50,22 55,39 70,37 60,49 68,64 50,56 32,64 40,49 30,37 45,39" fill="#FF4081"/>
-        <circle cx="22" cy="24" r="3.5" fill="#FFFFFF"/>
-        <circle cx="78" cy="24" r="3.5" fill="#FFFFFF"/>
-        <circle cx="18" cy="74" r="3" fill="#FFFFFF"/>
-        <circle cx="82" cy="74" r="3" fill="#FFFFFF"/>
-        <circle cx="50" cy="85" r="3.5" fill="#FFFFFF"/>
-      </svg>
-    `,
-    'cm-rainbow': `
-      <svg viewBox="0 0 100 100" width="100%" height="100%">
-        <!-- Cloud + Lightning Bolt -->
-        <path d="M 28 50 A 14 14 0 0 1 54 36 A 16 16 0 0 1 76 48 A 12 12 0 0 1 72 64 L 28 64 A 12 12 0 0 1 28 50 Z" fill="#FFFFFF" stroke="#B0BEC5" stroke-width="2.5"/>
-        <polygon points="46,58 36,74 48,74 40,94 62,70 50,70" fill="#FF1744" stroke="#D50000" stroke-width="1.5"/>
-        <polygon points="49,58 40,73 50,73 44,90 60,71 52,71" fill="#FFEA00"/>
-        <polygon points="52,58 44,72 52,72 48,86 58,72 54,72" fill="#00B0FF"/>
-      </svg>
-    `,
-    'cm-fluttershy': `
-      <svg viewBox="0 0 100 100" width="100%" height="100%">
-        <!-- 3 Pink Butterflies with Cyan bodies -->
-        <g transform="translate(25, 30)">
-          <ellipse cx="-8" cy="-5" rx="8" ry="6" fill="#FF80AB" stroke="#C51162" stroke-width="1.2" transform="rotate(-30)"/>
-          <ellipse cx="8" cy="-5" rx="8" ry="6" fill="#FF80AB" stroke="#C51162" stroke-width="1.2" transform="rotate(30)"/>
-          <ellipse cx="0" cy="0" rx="2.5" ry="8" fill="#00E5FF"/>
-        </g>
-        <g transform="translate(70, 35)">
-          <ellipse cx="-8" cy="-5" rx="8" ry="6" fill="#FF80AB" stroke="#C51162" stroke-width="1.2" transform="rotate(-30)"/>
-          <ellipse cx="8" cy="-5" rx="8" ry="6" fill="#FF80AB" stroke="#C51162" stroke-width="1.2" transform="rotate(30)"/>
-          <ellipse cx="0" cy="0" rx="2.5" ry="8" fill="#00E5FF"/>
-        </g>
-        <g transform="translate(48, 65)">
-          <ellipse cx="-9" cy="-6" rx="9" ry="7" fill="#FF80AB" stroke="#C51162" stroke-width="1.2" transform="rotate(-30)"/>
-          <ellipse cx="9" cy="-6" rx="9" ry="7" fill="#FF80AB" stroke="#C51162" stroke-width="1.2" transform="rotate(30)"/>
-          <ellipse cx="0" cy="0" rx="3" ry="9" fill="#00E5FF"/>
-        </g>
-      </svg>
-    `,
-    'cm-rarity': `
-      <svg viewBox="0 0 100 100" width="100%" height="100%">
-        <!-- 3 Sparkling Blue Diamonds -->
-        <polygon points="50,18 64,36 50,54 36,36" fill="#00E5FF" stroke="#0091EA" stroke-width="2.5"/>
-        <polygon points="50,22 60,36 50,50 40,36" fill="#E0F7FA"/>
-        <polygon points="30,46 42,60 30,74 18,60" fill="#00B0FF" stroke="#0091EA" stroke-width="2.5"/>
-        <polygon points="30,50 38,60 30,70 22,60" fill="#E0F7FA"/>
-        <polygon points="70,46 82,60 70,74 58,60" fill="#00B0FF" stroke="#0091EA" stroke-width="2.5"/>
-        <polygon points="70,50 78,60 70,70 62,60" fill="#E0F7FA"/>
-      </svg>
-    `,
-    'cm-applejack': `
-      <svg viewBox="0 0 100 100" width="100%" height="100%">
-        <!-- 3 Red Apples with green leaves -->
-        <g transform="translate(50, 36)">
-          <circle cx="-6" cy="0" r="10" fill="#FF1744"/>
-          <circle cx="6" cy="0" r="10" fill="#FF1744"/>
-          <path d="M 0 -8 Q 4 -16 10 -14" fill="none" stroke="#5D4037" stroke-width="2.5"/>
-          <ellipse cx="8" cy="-14" rx="4" ry="2" fill="#76FF03" transform="rotate(-20)"/>
-        </g>
-        <g transform="translate(32, 64)">
-          <circle cx="-5" cy="0" r="9" fill="#FF1744"/>
-          <circle cx="5" cy="0" r="9" fill="#FF1744"/>
-          <path d="M 0 -7 Q 4 -14 8 -12" fill="none" stroke="#5D4037" stroke-width="2"/>
-          <ellipse cx="6" cy="-12" rx="3.5" ry="1.8" fill="#76FF03" transform="rotate(-20)"/>
-        </g>
-        <g transform="translate(68, 64)">
-          <circle cx="-5" cy="0" r="9" fill="#FF1744"/>
-          <circle cx="5" cy="0" r="9" fill="#FF1744"/>
-          <path d="M 0 -7 Q 4 -14 8 -12" fill="none" stroke="#5D4037" stroke-width="2"/>
-          <ellipse cx="6" cy="-12" rx="3.5" ry="1.8" fill="#76FF03" transform="rotate(-20)"/>
-        </g>
-      </svg>
-    `,
-
-    // Mane 6 Guest Cameo Bust Fallbacks
-    twilight: `
-      <svg viewBox="0 0 200 240" width="100%" height="100%">
-        <ellipse cx="100" cy="140" rx="65" ry="60" fill="#D7BDE2" stroke="#8E44AD" stroke-width="4"/>
-        <polygon points="100,80 90,20 110,20" fill="#D7BDE2" stroke="#8E44AD" stroke-width="3"/>
-        <path d="M 50 110 Q 100 70 150 110" fill="#2C3E50"/>
-        <rect x="75" y="80" width="15" height="40" fill="#E91E63"/>
-        <ellipse cx="78" cy="140" rx="16" ry="22" fill="#6C3483"/>
-        <ellipse cx="122" cy="140" rx="16" ry="22" fill="#6C3483"/>
-        <circle cx="74" cy="134" r="5" fill="#FFFFFF"/>
-        <circle cx="118" cy="134" r="5" fill="#FFFFFF"/>
-      </svg>
-    `,
-    rainbow: `
-      <svg viewBox="0 0 200 240" width="100%" height="100%">
-        <ellipse cx="100" cy="140" rx="65" ry="60" fill="#A9CCE3" stroke="#2980B9" stroke-width="4"/>
-        <path d="M 40 100 Q 100 50 160 80" fill="#E74C3C"/>
-        <path d="M 45 110 Q 100 65 155 90" fill="#F39C12"/>
-        <path d="M 50 120 Q 100 80 150 100" fill="#F1C40F"/>
-        <ellipse cx="80" cy="140" rx="16" ry="22" fill="#C0392B"/>
-        <ellipse cx="120" cy="140" rx="16" ry="22" fill="#C0392B"/>
-        <circle cx="76" cy="134" r="5" fill="#FFFFFF"/>
-        <circle cx="116" cy="134" r="5" fill="#FFFFFF"/>
-      </svg>
-    `,
-    fluttershy: `
-      <svg viewBox="0 0 200 240" width="100%" height="100%">
-        <ellipse cx="100" cy="140" rx="65" ry="60" fill="#FCF3CF" stroke="#F1C40F" stroke-width="4"/>
-        <path d="M 45 90 Q 60 170 40 220 Q 100 80 155 95" fill="#FADBD8" stroke="#F1948A" stroke-width="3"/>
-        <ellipse cx="80" cy="145" rx="15" ry="20" fill="#16A085"/>
-        <ellipse cx="120" cy="145" rx="15" ry="20" fill="#16A085"/>
-        <circle cx="76" cy="139" r="4.5" fill="#FFFFFF"/>
-        <circle cx="116" cy="139" r="4.5" fill="#FFFFFF"/>
-      </svg>
-    `,
-    rarity: `
-      <svg viewBox="0 0 200 240" width="100%" height="100%">
-        <ellipse cx="100" cy="140" rx="65" ry="60" fill="#FFFFFF" stroke="#BDC3C7" stroke-width="4"/>
-        <polygon points="100,80 93,25 107,25" fill="#FFFFFF" stroke="#BDC3C7" stroke-width="3"/>
-        <path d="M 45 100 Q 100 40 160 70 Q 170 120 150 160" fill="#5B2C6F"/>
-        <ellipse cx="80" cy="140" rx="16" ry="22" fill="#2471A3"/>
-        <ellipse cx="120" cy="140" rx="16" ry="22" fill="#2471A3"/>
-        <circle cx="76" cy="134" r="5" fill="#FFFFFF"/>
-        <circle cx="116" cy="134" r="5" fill="#FFFFFF"/>
-      </svg>
-    `,
-    applejack: `
-      <svg viewBox="0 0 200 240" width="100%" height="100%">
-        <!-- Cowboy Hat -->
-        <ellipse cx="100" cy="65" rx="80" ry="25" fill="#B9770E"/>
-        <path d="M 65 65 Q 100 20 135 65 Z" fill="#935116"/>
-        <ellipse cx="100" cy="145" rx="65" ry="60" fill="#FAD7A0" stroke="#E67E22" stroke-width="4"/>
-        <path d="M 60 100 Q 100 120 140 95" fill="#F9E79F"/>
-        <ellipse cx="80" cy="145" rx="16" ry="22" fill="#27AE60"/>
-        <ellipse cx="120" cy="145" rx="16" ry="22" fill="#27AE60"/>
-        <circle cx="76" cy="139" r="5" fill="#FFFFFF"/>
-        <circle cx="116" cy="139" r="5" fill="#FFFFFF"/>
-      </svg>
-    `
-  };
-
-  // Sticker rotation includes all 12: 6 Y2K icons + 6 Mane 6 Cutie Marks
-  const STICKER_CONFIGS = [
-    { type: 'bone', file: 'assets/sticker-bone.png' },
-    { type: 'cm-pinkie', file: 'assets/cm-pinkie.png' },
-    { type: 'star', file: 'assets/sticker-star.png' },
-    { type: 'cm-twilight', file: 'assets/cm-twilight.png' },
-    { type: 'swirl', file: 'assets/sticker-swirl.png' },
-    { type: 'cm-rainbow', file: 'assets/cm-rainbow.png' },
-    { type: 'cat', file: 'assets/sticker-cat.png' },
-    { type: 'cm-fluttershy', file: 'assets/cm-fluttershy.png' },
-    { type: 'bow', file: 'assets/sticker-bow.png' },
-    { type: 'cm-rarity', file: 'assets/cm-rarity.png' },
-    { type: 'heart', file: 'assets/sticker-heart.png' },
-    { type: 'cm-applejack', file: 'assets/cm-applejack.png' }
-  ];
-
-  /* ==========================================================================
-     5. Pinkie Pie Character & Bulletproof Image Fallback
+     6. Milestone 3: Center Stage Pony Rig & Dynamic Expression Controller
      ========================================================================== */
 
   const pinkieCharacter = document.getElementById('pinkie-character');
   const pinkieIdleImg = document.getElementById('pinkie-idle-img');
-  const pinkieBlinkImg = document.getElementById('pinkie-blink-img');
   const pinkieSvgFallback = document.getElementById('pinkie-svg-fallback');
   const stickerSurface = document.getElementById('sticker-surface');
 
+  const rigPatchLeft = document.getElementById('rig-eye-patch-left');
+  const rigPatchRight = document.getElementById('rig-eye-patch-right');
+  const rigBlushLeft = document.getElementById('rig-blush-left');
+  const rigBlushRight = document.getElementById('rig-blush-right');
+  const rigStarEyeLeft = document.getElementById('rig-star-eye-left');
+  const rigStarEyeRight = document.getElementById('rig-star-eye-right');
+
+  let exprTimeout = null;
+  let lastClickTime = 0;
   let useSvgFallback = false;
-  let blinkTimeout = null;
 
-  pinkieIdleImg.addEventListener('error', () => {
-    activateSvgFallback();
-  });
+  function switchMainCharacter(ponyId) {
+    const char = MANE_6_CHARACTERS[ponyId];
+    if (!char) return;
+    currentCharacterId = ponyId;
 
-  pinkieBlinkImg.addEventListener('error', () => {
-    // Handled gracefully via CSS
-  });
+    document.body.dataset.pony = ponyId;
+    document.documentElement.style.setProperty('--character-coat-color', char.coatColor);
+    document.documentElement.style.setProperty('--character-eye-color', char.eyeColor);
 
-  function activateSvgFallback() {
-    useSvgFallback = true;
-    pinkieIdleImg.style.display = 'none';
-    pinkieBlinkImg.style.display = 'none';
-    pinkieSvgFallback.style.display = 'flex';
+    // Update main image
+    pinkieIdleImg.src = char.file;
+    pinkieIdleImg.alt = char.name;
+
+    // Adapt Vector Face Rig coordinates
+    if (rigPatchLeft && rigPatchRight && char.rig) {
+      rigPatchLeft.setAttribute('cx', char.rig.leftEye.cx);
+      rigPatchLeft.setAttribute('cy', char.rig.leftEye.cy);
+      rigPatchLeft.setAttribute('rx', char.rig.leftEye.rx);
+      rigPatchLeft.setAttribute('ry', char.rig.leftEye.ry);
+
+      rigPatchRight.setAttribute('cx', char.rig.rightEye.cx);
+      rigPatchRight.setAttribute('cy', char.rig.rightEye.cy);
+      rigPatchRight.setAttribute('rx', char.rig.rightEye.rx);
+      rigPatchRight.setAttribute('ry', char.rig.rightEye.ry);
+
+      if (rigBlushLeft && rigBlushRight && char.rig.blushLeft) {
+        rigBlushLeft.setAttribute('cx', char.rig.blushLeft.cx);
+        rigBlushLeft.setAttribute('cy', char.rig.blushLeft.cy);
+        rigBlushRight.setAttribute('cx', char.rig.blushRight.cx);
+        rigBlushRight.setAttribute('cy', char.rig.blushRight.cy);
+      }
+    }
+
+    // Update dock active buttons
+    const dockButtons = document.querySelectorAll('.pony-dock-btn');
+    dockButtons.forEach((btn) => {
+      btn.classList.toggle('active', btn.dataset.pony === ponyId);
+    });
+
+    soundFX.playPonySwitchChime(ponyId);
+    executeSignatureEffect(ponyId);
   }
 
-  function triggerPinkieReaction() {
+  function clearAllExpressions() {
+    pinkieCharacter.classList.remove('expr-blink', 'expr-happy', 'expr-wink', 'expr-starry');
+  }
+
+  function triggerPonyReaction(forcedExpr = null) {
     pinkieCharacter.classList.remove('pinkie-squish');
     void pinkieCharacter.offsetWidth;
     pinkieCharacter.classList.add('pinkie-squish');
 
-    pinkieCharacter.classList.add('is-blinking');
+    const now = performance.now();
+    let chosenExpr = forcedExpr;
+    if (!chosenExpr) {
+      chosenExpr = (now - lastClickTime < 550) ? 'wink' : 'happy';
+    }
+    lastClickTime = now;
+
+    clearAllExpressions();
+    pinkieCharacter.classList.add(`expr-${chosenExpr}`);
 
     if (useSvgFallback) {
       const normalEyes = document.getElementById('svg-normal-eyes');
@@ -719,9 +751,9 @@
       }
     }
 
-    clearTimeout(blinkTimeout);
-    blinkTimeout = setTimeout(() => {
-      pinkieCharacter.classList.remove('is-blinking');
+    clearTimeout(exprTimeout);
+    exprTimeout = setTimeout(() => {
+      clearAllExpressions();
       if (useSvgFallback) {
         const normalEyes = document.getElementById('svg-normal-eyes');
         const closedEyes = document.getElementById('svg-closed-eyes');
@@ -730,16 +762,54 @@
           closedEyes.style.display = 'none';
         }
       }
-    }, 420);
+    }, chosenExpr === 'starry' ? 1200 : 450);
   }
 
+  // Idle natural blink timer (checked against isPaused)
+  setInterval(() => {
+    if (isPaused) return;
+    const isBusy =
+      pinkieCharacter.classList.contains('expr-happy') ||
+      pinkieCharacter.classList.contains('expr-wink') ||
+      pinkieCharacter.classList.contains('expr-starry');
+
+    if (!isBusy) {
+      pinkieCharacter.classList.add('expr-blink');
+      setTimeout(() => {
+        pinkieCharacter.classList.remove('expr-blink');
+      }, 160);
+    }
+  }, 3800);
+
+  pinkieIdleImg.addEventListener('error', () => {
+    useSvgFallback = true;
+    const rigFrame = document.getElementById('pinkie-rig-frame');
+    if (rigFrame) rigFrame.style.display = 'none';
+    pinkieSvgFallback.style.display = 'flex';
+  });
+
   /* ==========================================================================
-     6. Layer 3: Interactive Sticker Slapping
+     7. Milestone 3: Interactive Sticker Slapping, Harmony Combo & Party Cannon
      ========================================================================== */
+
+  const STICKER_CONFIGS = [
+    { type: 'star', file: 'assets/sticker-star.png' },
+    { type: 'cm-pinkie', file: 'assets/cm-pinkie.png', isCutieMark: true, pony: 'pinkie' },
+    { type: 'swirl', file: 'assets/sticker-swirl.png' },
+    { type: 'cm-twilight', file: 'assets/cm-twilight.png', isCutieMark: true, pony: 'twilight' },
+    { type: 'bone', file: 'assets/sticker-bone.png' },
+    { type: 'cm-rainbow', file: 'assets/cm-rainbow.png', isCutieMark: true, pony: 'rainbow' },
+    { type: 'cat', file: 'assets/sticker-cat.png' },
+    { type: 'cm-fluttershy', file: 'assets/cm-fluttershy.png', isCutieMark: true, pony: 'fluttershy' },
+    { type: 'bow', file: 'assets/sticker-bow.png' },
+    { type: 'cm-rarity', file: 'assets/cm-rarity.png', isCutieMark: true, pony: 'rarity' },
+    { type: 'heart', file: 'assets/sticker-heart.png' },
+    { type: 'cm-applejack', file: 'assets/cm-applejack.png', isCutieMark: true, pony: 'applejack' }
+  ];
 
   let stickerCycleIndex = 0;
   let currentStickerCount = 0;
-  const placedStickers = [];
+  const activeRoundCutieMarks = new Set();
   let isCascadeActive = false;
 
   stickerSurface.addEventListener('pointerdown', (e) => {
@@ -755,7 +825,7 @@
     const pctY = (clickY / rect.height) * 100;
 
     triggerClickRipple(e.clientX, e.clientY);
-    triggerPinkieReaction();
+    triggerPonyReaction();
     soundFX.playStickerPop();
 
     slapSticker(pctX, pctY);
@@ -766,16 +836,11 @@
     stickerCycleIndex++;
     currentStickerCount++;
 
-    const rotation = (Math.random() - 0.5) * 44;
-    const stickerData = {
-      type: config.type,
-      file: config.file,
-      pctX,
-      pctY,
-      rotation
-    };
-    placedStickers.push(stickerData);
+    if (config.isCutieMark && config.pony) {
+      activeRoundCutieMarks.add(config.pony);
+    }
 
+    const rotation = (Math.random() - 0.5) * 44;
     const el = document.createElement('div');
     el.className = 'slapped-sticker';
     el.style.left = `${pctX}%`;
@@ -786,15 +851,18 @@
     img.src = config.file;
     img.alt = config.type;
     img.draggable = false;
-    img.onerror = () => {
-      el.innerHTML = SVG_FALLBACKS[config.type] || '';
-    };
     el.appendChild(img);
 
     stickerSurface.appendChild(el);
 
-    // Check if 7 stickers placed -> Trigger Randomized Draggable Cascade Popups!
-    if (currentStickerCount === 7) {
+    // Check Milestone 3: Elements of Harmony Combo (All 6 Mane 6 cutie marks placed!)
+    if (activeRoundCutieMarks.size === 6) {
+      triggerElementsOfHarmonyCombo();
+      return;
+    }
+
+    // Check Popup Threshold in Party Mode (Chill mode suppresses disruptive popup cascade)
+    if (!isChillMode && currentStickerCount >= popupStickerThreshold) {
       isCascadeActive = true;
       setTimeout(() => {
         triggerRetroWindowCascade();
@@ -802,8 +870,79 @@
     }
   }
 
+  /** Milestone 3: Full-Screen 6-Color Rainbow Combo */
+  function triggerElementsOfHarmonyCombo() {
+    soundFX.playHarmonyChord();
+    triggerPonyReaction('starry');
+
+    const comboOverlay = document.getElementById('harmony-combo-container');
+    if (comboOverlay) {
+      comboOverlay.classList.add('active');
+      setTimeout(() => {
+        comboOverlay.classList.remove('active');
+        activeRoundCutieMarks.clear();
+      }, 3400);
+    }
+    triggerCelebrationBurst();
+  }
+
+  /** Milestone 3: Party Cannon Reset with Parabolic Physics Flight */
+  function triggerPartyCannonReset() {
+    soundFX.playCannonBoom();
+
+    const stickers = Array.from(stickerSurface.querySelectorAll('.slapped-sticker'));
+    if (stickers.length === 0) {
+      triggerCelebrationBurst();
+      return;
+    }
+
+    stickers.forEach((st) => {
+      const rect = st.getBoundingClientRect();
+      st.classList.add('cannon-projectile');
+      st.style.left = `${rect.left}px`;
+      st.style.top = `${rect.top}px`;
+      document.body.appendChild(st);
+
+      let px = rect.left;
+      let py = rect.top;
+      let vx = (Math.random() - 0.5) * 22;
+      let vy = -12 - Math.random() * 14;
+      let rot = 0;
+      const rotSpeed = (Math.random() - 0.5) * 20;
+      const gravity = 0.88;
+
+      function stepProjectile() {
+        if (isPaused) {
+          requestAnimationFrame(stepProjectile);
+          return;
+        }
+        px += vx;
+        py += vy;
+        vy += gravity;
+        rot += rotSpeed;
+
+        st.style.left = `${px}px`;
+        st.style.top = `${py}px`;
+        st.style.transform = `rotate(${rot}deg) scale(1.1)`;
+
+        if (py < window.innerHeight + 100) {
+          requestAnimationFrame(stepProjectile);
+        } else {
+          st.remove();
+        }
+      }
+      requestAnimationFrame(stepProjectile);
+    });
+
+    currentStickerCount = 0;
+    activeRoundCutieMarks.clear();
+    isCascadeActive = false;
+    triggerCelebrationBurst();
+    triggerPonyReaction();
+  }
+
   /* ==========================================================================
-     7. Layer 4: Randomized & Draggable Retro Pop-up Windows
+     8. Milestone 2: Retro Windows 95/98 Pop-up Cascades & Drag Controller
      ========================================================================== */
 
   const windowOverlay = document.getElementById('window-overlay');
@@ -817,8 +956,7 @@
       icon: '🔮',
       title: '🔮 · Twilight_Library.sys',
       themeClass: 'titlebar-twilight',
-      file: 'assets/twilight.png',
-      decor: 'magic-star'
+      file: 'assets/twilight.png'
     },
     {
       id: 'rainbow',
@@ -826,8 +964,7 @@
       icon: '⚡',
       title: '⚡ · Sonic_Rainboom.avi',
       themeClass: 'titlebar-rainbow',
-      file: 'assets/rainbow.png',
-      decor: 'lightning'
+      file: 'assets/rainbow.png'
     },
     {
       id: 'fluttershy',
@@ -835,8 +972,7 @@
       icon: '🌸',
       title: '🌸 · Kindness_Vibes.exe',
       themeClass: 'titlebar-fluttershy',
-      file: 'assets/fluttershy.png',
-      decor: 'butterfly'
+      file: 'assets/fluttershy.png'
     },
     {
       id: 'rarity',
@@ -844,305 +980,134 @@
       icon: '💎',
       title: '💎 · Fabulous_Design.exe',
       themeClass: 'titlebar-rarity',
-      file: 'assets/rarity.png',
-      decor: 'diamond'
+      file: 'assets/rarity.png'
     },
     {
       id: 'applejack',
       name: 'Applejack',
       icon: '🍎',
-      title: '🍎 · Sweet_Apple_Acres.exe',
+      title: '🍎 · Sweet_Apple_Acres.bat',
       themeClass: 'titlebar-applejack',
-      file: 'assets/applejack.png',
-      decor: 'apple'
+      file: 'assets/applejack.png'
     }
   ];
 
-  const FUN_ALERTS = [
-    {
-      icon: '⚠️',
-      msg: 'Error 404: Too Much Sugar in the Party Cannon!',
-      title: 'Sugar_Overflow.dll'
-    },
-    {
-      icon: '🎉',
-      msg: 'Party_Cannon.exe is 100% Loaded & Ready to Fire!',
-      title: 'Party_Cannon.exe'
-    },
-    {
-      icon: '💖',
-      msg: 'Friendship_Level_MAX.dll successfully installed!',
-      title: 'Friendship_Core.sys'
-    },
-    {
-      icon: '🧁',
-      msg: 'Warning: Extreme Cuteness Overload detected in Ponyville!',
-      title: 'Cuteness_Alert.bmp'
-    },
-    {
-      icon: '🍬',
-      msg: 'Notice: Cupcake inventory running critically high!',
-      title: 'Cupcake_Storage.dat'
-    }
-  ];
+  function triggerRetroWindowCascade() {
+    const cascadeTotal = 5;
+    const startLeft = Math.max(16, (window.innerWidth - 380) * 0.15);
+    const startTop = Math.max(20, (window.innerHeight - 300) * 0.12);
+    const stepX = Math.min(38, (window.innerWidth - 380) / 7);
+    const stepY = Math.min(36, (window.innerHeight - 300) / 7);
 
-  function triggerRetroWindowCascade(forcedCount = null) {
-    windowOverlay.innerHTML = '';
-    openWindows = [];
+    for (let i = 0; i < cascadeTotal; i++) {
+      const isCameo = i % 2 === 1;
+      const type = isCameo ? 'cameo' : (i === cascadeTotal - 1 ? 'alert' : 'pinkie');
+      const left = startLeft + i * stepX + (Math.random() - 0.5) * 16;
+      const top = startTop + i * stepY + (Math.random() - 0.5) * 12;
 
-    // Random count of 3 to 6 pop-up windows
-    const count = forcedCount || (Math.floor(Math.random() * 4) + 3);
-
-    // Guaranteed to include at least 1 Pinkie Zoom Cam and 1 Cameo
-    const windowTypes = [];
-    windowTypes.push('pinkie');
-    windowTypes.push('cameo');
-    if (count >= 3) windowTypes.push('alert');
-    while (windowTypes.length < count) {
-      const r = Math.random();
-      if (r < 0.4) windowTypes.push('cameo');
-      else if (r < 0.75) windowTypes.push('pinkie');
-      else windowTypes.push('alert');
-    }
-
-    // Shuffle types slightly
-    windowTypes.sort(() => Math.random() - 0.5);
-
-    windowTypes.forEach((type, index) => {
-      const delay = index * 120;
       setTimeout(() => {
-        // Safe randomized coordinates (X: 10%..62%, Y: 12%..52%)
-        const baseLeft = 12 + (index * 9) + (Math.random() - 0.5) * 8;
-        const baseTop = 14 + (index * 8) + (Math.random() - 0.5) * 8;
-        const safeLeft = Math.max(8, Math.min(65, baseLeft));
-        const safeTop = Math.max(10, Math.min(54, baseTop));
-
-        const win = createRetroWindow(type, safeLeft, safeTop);
+        if (!isCascadeActive) return;
+        const win = createRetroWindow(type, left, top);
         windowOverlay.appendChild(win);
         openWindows.push(win);
-
         soundFX.playWindowSpawn();
-
-        requestAnimationFrame(() => {
-          win.classList.add('is-open');
-        });
-      }, delay);
-    });
+        requestAnimationFrame(() => win.classList.add('is-open'));
+      }, i * 140);
+    }
   }
 
-  function createRetroWindow(type, leftPct, topPct) {
+  function createRetroWindow(type, posX, posY) {
     const win = document.createElement('div');
     win.className = 'retro-window';
-    win.style.left = `${leftPct}%`;
-    win.style.top = `${topPct}%`;
-    highestZIndex++;
-    win.style.zIndex = highestZIndex;
+    win.style.left = `${posX}px`;
+    win.style.top = `${posY}px`;
+    win.style.zIndex = highestZIndex++;
 
-    if (type === 'alert') {
-      setupAlertWindow(win);
-    } else if (type === 'cameo') {
-      setupCameoWindow(win);
-    } else {
-      setupPinkieZoomWindow(win);
-    }
-
-    // Attach draggable AFTER title bar has been added to the DOM
-    makeWindowDraggable(win);
-
-    return win;
-  }
-
-  function setupPinkieZoomWindow(win) {
-    const titles = ['📷 · 🎀 PinkieCam_01.exe', '✨ · 💖 SuperParty.dll', '🎬 · 🎀 Y2K_StickerMania.avi', '🎨 · 🧁 Pinkie_Vision.bmp'];
-    const titleStr = titles[Math.floor(Math.random() * titles.length)];
-
-    const titleBar = createTitleBar(titleStr, 'titlebar-pinkie', win);
-    win.appendChild(titleBar);
-
-    const winBody = document.createElement('div');
-    winBody.className = 'retro-window-body';
-
-    // Synchronized zoomed-in close-up of Pinkie Pie's upper face & blue eyes
-    const closeupImg = document.createElement('img');
-    closeupImg.className = 'popup-pinkie-closeup';
-    closeupImg.src = 'assets/pinkie-idle.png';
-    closeupImg.alt = 'Pinkie Pie Closeup';
-    closeupImg.draggable = false;
-    closeupImg.onerror = () => {
-      closeupImg.style.display = 'none';
-      const fallbackDiv = document.createElement('div');
-      fallbackDiv.className = 'popup-pinkie-closeup';
-      fallbackDiv.innerHTML = SVG_FALLBACKS.cat;
-      winBody.appendChild(fallbackDiv);
-    };
-    winBody.appendChild(closeupImg);
-
-    // Replicate placed stickers in window viewport
-    const stickerLayer = document.createElement('div');
-    stickerLayer.className = 'popup-sticker-layer';
-    placedStickers.forEach((st) => {
-      const item = document.createElement('div');
-      item.className = 'popup-sticker-item';
-      const mappedX = ((st.pctX - 50) * 2.1) + 50;
-      const mappedY = ((st.pctY - 48) * 2.1) + 50;
-      item.style.left = `${Math.max(8, Math.min(92, mappedX))}%`;
-      item.style.top = `${Math.max(8, Math.min(92, mappedY))}%`;
-      item.style.transform = `translate(-50%, -50%) rotate(${st.rotation}deg) scale(0.9)`;
-
-      const stImg = document.createElement('img');
-      stImg.src = st.file;
-      stImg.alt = st.type;
-      stImg.onerror = () => {
-        item.innerHTML = SVG_FALLBACKS[st.type] || '';
-      };
-      item.appendChild(stImg);
-      stickerLayer.appendChild(item);
-    });
-    winBody.appendChild(stickerLayer);
-
-    // Floating Retro Hearts
-    addFloatingHearts(winBody);
-
-    const scanlines = document.createElement('div');
-    scanlines.className = 'retro-scanlines';
-    winBody.appendChild(scanlines);
-
-    win.appendChild(winBody);
-  }
-
-  function setupCameoWindow(win) {
-    const cameo = MANE_6_CAMEOS[Math.floor(Math.random() * MANE_6_CAMEOS.length)];
-
-    const titleBar = createTitleBar(cameo.title, cameo.themeClass, win);
-    win.appendChild(titleBar);
-
-    const winBody = document.createElement('div');
-    winBody.className = 'retro-window-body';
-
-    // Guest Pony Bust
-    const guestImg = document.createElement('img');
-    guestImg.className = 'popup-guest-pony';
-    guestImg.src = cameo.file;
-    guestImg.alt = cameo.name;
-    guestImg.draggable = false;
-    guestImg.onerror = () => {
-      guestImg.style.display = 'none';
-      const fallbackDiv = document.createElement('div');
-      fallbackDiv.className = 'popup-guest-pony';
-      fallbackDiv.innerHTML = SVG_FALLBACKS[cameo.id] || '';
-      winBody.appendChild(fallbackDiv);
-    };
-    winBody.appendChild(guestImg);
-
-    // Floating themed decorative item
-    const decor = document.createElement('div');
-    decor.className = 'popup-guest-theme-item';
-    decor.style.top = '12%';
-    decor.style.right = '12%';
-    if (cameo.id === 'twilight') decor.innerHTML = SVG_FALLBACKS['cm-twilight'];
-    else if (cameo.id === 'rainbow') decor.innerHTML = SVG_FALLBACKS['cm-rainbow'];
-    else if (cameo.id === 'fluttershy') decor.innerHTML = SVG_FALLBACKS['cm-fluttershy'];
-    else if (cameo.id === 'rarity') decor.innerHTML = SVG_FALLBACKS['cm-rarity'];
-    else decor.innerHTML = SVG_FALLBACKS['cm-applejack'];
-    winBody.appendChild(decor);
-
-    // Floating hearts
-    addFloatingHearts(winBody);
-
-    const scanlines = document.createElement('div');
-    scanlines.className = 'retro-scanlines';
-    winBody.appendChild(scanlines);
-
-    win.appendChild(winBody);
-  }
-
-  function setupAlertWindow(win) {
-    win.classList.add('window-alert');
-    const alertData = FUN_ALERTS[Math.floor(Math.random() * FUN_ALERTS.length)];
-
-    const titleBar = createTitleBar(`⚠️ ${alertData.title}`, 'titlebar-alert', win);
-    win.appendChild(titleBar);
-
-    const alertBody = document.createElement('div');
-    alertBody.className = 'retro-alert-body';
-
-    const content = document.createElement('div');
-    content.className = 'retro-alert-content';
-    content.innerHTML = `
-      <div class="retro-alert-icon">${alertData.icon}</div>
-      <div class="retro-alert-msg">${alertData.msg}</div>
-    `;
-    alertBody.appendChild(content);
-
-    const yayBtn = document.createElement('button');
-    yayBtn.className = 'retro-alert-btn';
-    yayBtn.textContent = 'Yay!';
-    yayBtn.addEventListener('pointerdown', (e) => {
-      e.stopPropagation();
-      closeRetroWindow(win);
-    });
-    alertBody.appendChild(yayBtn);
-
-    win.appendChild(alertBody);
-  }
-
-  function createTitleBar(titleText, themeClass, win) {
     const titleBar = document.createElement('div');
-    titleBar.className = `retro-window-titlebar ${themeClass}`;
+    titleBar.className = 'retro-window-titlebar';
 
-    const textSpan = document.createElement('div');
-    textSpan.className = 'retro-title-text';
-    textSpan.textContent = titleText;
+    const titleText = document.createElement('div');
+    titleText.className = 'retro-title-text';
 
     const closeBtn = document.createElement('button');
+    closeBtn.type = 'button';
     closeBtn.className = 'retro-close-btn';
-    closeBtn.setAttribute('title', 'Close Window');
+    closeBtn.innerHTML = '×';
     closeBtn.setAttribute('aria-label', 'Close Window');
-    closeBtn.innerHTML = '✕';
-
     closeBtn.addEventListener('pointerdown', (e) => {
       e.stopPropagation();
       closeRetroWindow(win);
     });
 
-    titleBar.appendChild(textSpan);
+    const winBody = document.createElement('div');
+
+    if (type === 'pinkie') {
+      titleBar.classList.add('titlebar-pinkie');
+      titleText.innerHTML = '<span class="retro-title-icon">🎈</span><span>PinkieParty_32.dll</span>';
+
+      winBody.className = 'retro-window-body';
+      const img = document.createElement('img');
+      img.className = 'popup-pinkie-closeup';
+      img.src = 'assets/pinkie-idle.png';
+      img.alt = 'Pinkie Pie Face';
+      winBody.appendChild(img);
+
+      const scan = document.createElement('div');
+      scan.className = 'retro-scanlines';
+      winBody.appendChild(scan);
+
+    } else if (type === 'cameo') {
+      const cameo = MANE_6_CAMEOS[Math.floor(Math.random() * MANE_6_CAMEOS.length)];
+      titleBar.classList.add(cameo.themeClass);
+      titleText.innerHTML = `<span class="retro-title-icon">${cameo.icon}</span><span>${cameo.title}</span>`;
+
+      winBody.className = 'retro-window-body';
+      const guestImg = document.createElement('img');
+      guestImg.className = 'popup-guest-pony';
+      guestImg.src = cameo.file;
+      guestImg.alt = cameo.name;
+      winBody.appendChild(guestImg);
+
+    } else {
+      win.classList.add('window-alert');
+      titleBar.classList.add('titlebar-alert');
+      titleText.innerHTML = '<span class="retro-title-icon">⚠️</span><span>PARTY_OVERFLOW.SYS</span>';
+
+      winBody.className = 'retro-alert-body';
+      const content = document.createElement('div');
+      content.className = 'retro-alert-content';
+      content.innerHTML = `
+        <span class="retro-alert-icon">🧁</span>
+        <div class="retro-alert-msg">PARTY QUOTA EXCEEDED!<br>Equestrian friendship overload in sector 7!</div>
+      `;
+      const okBtn = document.createElement('button');
+      okBtn.type = 'button';
+      okBtn.className = 'retro-alert-btn';
+      okBtn.textContent = 'Party On!';
+      okBtn.addEventListener('pointerdown', (e) => {
+        e.stopPropagation();
+        closeRetroWindow(win);
+      });
+      winBody.appendChild(content);
+      winBody.appendChild(okBtn);
+    }
+
+    titleBar.appendChild(titleText);
     titleBar.appendChild(closeBtn);
-    return titleBar;
+    win.appendChild(titleBar);
+    win.appendChild(winBody);
+
+    makeElementDraggable(win, titleBar);
+    return win;
   }
 
-  function addFloatingHearts(container) {
-    const h1 = document.createElement('div');
-    h1.className = 'popup-floating-heart';
-    h1.style.top = '12%';
-    h1.style.left = '10%';
-    h1.innerHTML = SVG_FALLBACKS.heart;
-    container.appendChild(h1);
-
-    const h2 = document.createElement('div');
-    h2.className = 'popup-floating-heart';
-    h2.style.bottom = '14%';
-    h2.style.right = '12%';
-    h2.style.animationDelay = '-1.3s';
-    h2.innerHTML = SVG_FALLBACKS.heart;
-    container.appendChild(h2);
-  }
-
-  /** Make any retro window draggable by its title bar */
-  function makeWindowDraggable(win) {
+  function makeElementDraggable(win, handle) {
     let isDragging = false;
-    let startX = 0;
-    let startY = 0;
-    let initLeft = 0;
-    let initTop = 0;
-
-    const titleBar = win.querySelector('.retro-window-titlebar') || win;
+    let startX = 0, startY = 0;
+    let initLeft = 0, initTop = 0;
 
     const onPointerDown = (e) => {
-      // Don't drag if clicking close button
-      if (e.target.closest('.retro-close-btn') || e.target.closest('.retro-alert-btn')) return;
-
-      soundFX.init();
-
+      if (e.target.closest('button') || e.target.closest('input')) return;
       isDragging = true;
       win.classList.add('is-dragging');
       highestZIndex++;
@@ -1154,13 +1119,11 @@
       initLeft = rect.left;
       initTop = rect.top;
 
-      // Lock to absolute pixel position
       win.style.left = `${initLeft}px`;
       win.style.top = `${initTop}px`;
 
       window.addEventListener('pointermove', onPointerMove);
       window.addEventListener('pointerup', onPointerUp);
-      window.addEventListener('pointercancel', onPointerUp);
     };
 
     const onPointerMove = (e) => {
@@ -1170,12 +1133,11 @@
 
       let newLeft = initLeft + dx;
       let newTop = initTop + dy;
+      const winW = win.offsetWidth || 280;
+      const winH = win.offsetHeight || 220;
 
-      // Clamp within safe viewport bounds
-      const winW = win.offsetWidth || 300;
-      const winH = win.offsetHeight || 240;
-      newLeft = Math.max(10, Math.min(window.innerWidth - winW - 10, newLeft));
-      newTop = Math.max(10, Math.min(window.innerHeight - winH - 10, newTop));
+      newLeft = Math.max(5, Math.min(window.innerWidth - winW - 5, newLeft));
+      newTop = Math.max(5, Math.min(window.innerHeight - winH - 5, newTop));
 
       win.style.left = `${newLeft}px`;
       win.style.top = `${newTop}px`;
@@ -1187,63 +1149,457 @@
       win.classList.remove('is-dragging');
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerup', onPointerUp);
-      window.removeEventListener('pointercancel', onPointerUp);
     };
 
-    titleBar.addEventListener('pointerdown', onPointerDown);
+    handle.addEventListener('pointerdown', onPointerDown);
   }
 
   function closeRetroWindow(win) {
     soundFX.playWindowClose();
-
     win.classList.remove('is-open');
     win.classList.add('is-closing');
-
     openWindows = openWindows.filter((w) => w !== win);
 
     setTimeout(() => {
       win.remove();
-
       if (openWindows.length === 0) {
         completeLoopReset();
       }
     }, 240);
   }
 
+  function completeLoopReset() {
+    triggerRandomSignatureEffect();
+    triggerCelebrationBurst();
+    triggerPartyCannonReset();
+  }
+
   /* ==========================================================================
-     8. Loop Reset & Mane 6 Signature Screen Effects
+     9. Milestone 2: Real-Time Audio Visualizer (Winamp Style)
      ========================================================================== */
 
-  const resetBurstContainer = document.getElementById('reset-burst-container');
-  const signatureEffectsContainer = document.getElementById('signature-effects-container');
+  const winampVisualizer = document.getElementById('winamp-visualizer');
+  const winampCanvas = document.getElementById('winamp-canvas');
+  const winampCtx = winampCanvas.getContext('2d');
+  const winampBpm = document.getElementById('winamp-bpm');
+  const btnWinampMin = document.getElementById('btn-winamp-min');
+  const btnWinampSim = document.getElementById('btn-winamp-sim');
+  const btnVisualizerToggle = document.getElementById('btn-visualizer-toggle');
 
-  function completeLoopReset() {
-    soundFX.playResetSparkle();
+  let audioSpectrumData = new Float32Array(128);
+  let isSimulatingAudio = false;
+  let lastAudioTick = 0;
 
-    // 1. Randomly trigger one of 5 Mane 6 Signature Screen Effects!
-    triggerRandomSignatureEffect();
+  btnWinampMin.addEventListener('pointerdown', (e) => {
+    e.stopPropagation();
+    winampVisualizer.classList.toggle('is-minimized');
+  });
 
-    // 2. Trigger celebration sparkle & heart particle burst
-    triggerCelebrationBurst();
+  btnVisualizerToggle.addEventListener('pointerdown', (e) => {
+    e.stopPropagation();
+    const isHidden = winampVisualizer.style.display === 'none';
+    winampVisualizer.style.display = isHidden ? 'block' : 'none';
+    btnVisualizerToggle.classList.toggle('active', isHidden);
+  });
 
-    // 3. Clear all slapped stickers with smooth exit
-    const allStickers = stickerSurface.querySelectorAll('.slapped-sticker');
-    allStickers.forEach((st, idx) => {
-      setTimeout(() => {
-        st.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
-        st.style.transform = `${st.style.transform} scale(0)`;
-        st.style.opacity = '0';
-        setTimeout(() => st.remove(), 300);
-      }, idx * 25);
+  btnWinampSim.addEventListener('pointerdown', (e) => {
+    e.stopPropagation();
+    isSimulatingAudio = !isSimulatingAudio;
+    btnWinampSim.textContent = isSimulatingAudio ? 'SIM ACTIVE' : 'SIM TEST';
+  });
+
+  makeElementDraggable(winampVisualizer, document.getElementById('winamp-titlebar'));
+
+  // Native Lively Wallpaper Audio Listener (128 Frequency Bands)
+  window.livelyAudioListener = function (audioArray) {
+    if (audioArray && audioArray.length > 0) {
+      lastAudioTick = performance.now();
+      const len = Math.min(audioArray.length, audioSpectrumData.length);
+      for (let i = 0; i < len; i++) {
+        audioSpectrumData[i] = audioArray[i];
+      }
+      processAudioBass();
+    }
+  };
+
+  function processAudioBass() {
+    let bassSum = 0;
+    const bassBins = 16;
+    for (let i = 0; i < bassBins; i++) {
+      bassSum += audioSpectrumData[i] || 0;
+    }
+    const bassAvg = bassSum / bassBins; // 0.0 to 1.0
+
+    // Drive Character Bounce & Scale
+    const bounceY = -bassAvg * 18;
+    const scaleAmp = 1 + bassAvg * 0.08;
+    const glowAmp = bassAvg * 16;
+
+    document.documentElement.style.setProperty('--bass-bounce', `${bounceY}px`);
+    document.documentElement.style.setProperty('--bass-scale', scaleAmp.toString());
+    document.documentElement.style.setProperty('--bass-glow', `${glowAmp}px`);
+
+    winampBpm.textContent = `BASS: ${Math.round(bassAvg * 100)}%`;
+  }
+
+  function renderWinampEQ() {
+    const w = winampCanvas.width;
+    const h = winampCanvas.height;
+    winampCtx.clearRect(0, 0, w, h);
+
+    // If simulation mode or idle without active Lively audio
+    const now = performance.now();
+    if (isSimulatingAudio || (now - lastAudioTick > 2000 && !isPaused)) {
+      for (let i = 0; i < audioSpectrumData.length; i++) {
+        const freq = (i + 1) * 0.15;
+        const val = (Math.sin(now * 0.006 + freq) * 0.5 + 0.5) * (1 - i / 128);
+        audioSpectrumData[i] = Math.max(0.05, val * (isSimulatingAudio ? 0.9 : 0.25));
+      }
+      processAudioBass();
+    }
+
+    const bars = 24;
+    const barWidth = Math.floor(w / bars) - 2;
+    const step = Math.floor(128 / bars);
+
+    for (let i = 0; i < bars; i++) {
+      const val = audioSpectrumData[i * step] || 0;
+      const barHeight = Math.max(3, Math.min(h - 2, val * (h - 2)));
+      const x = i * (barWidth + 2) + 2;
+      const y = h - barHeight;
+
+      // Classic Winamp LED Segment Gradient: Green -> Yellow -> Red
+      const grad = winampCtx.createLinearGradient(0, h, 0, 0);
+      grad.addColorStop(0.0, '#00FF66');
+      grad.addColorStop(0.6, '#FFFF00');
+      grad.addColorStop(1.0, '#FF0033');
+
+      winampCtx.fillStyle = grad;
+      winampCtx.fillRect(x, y, barWidth, barHeight);
+    }
+  }
+
+  /* ==========================================================================
+     10. Milestone 2: Live Hardware Monitor (Ponyville_TaskMgr.exe)
+     ========================================================================== */
+
+  const taskmgrWindow = document.getElementById('taskmgr-window');
+  const btnTaskmgrToggle = document.getElementById('btn-taskmgr-toggle');
+  const btnTaskmgrClose = document.getElementById('btn-taskmgr-close');
+  const taskmgrTitlebar = document.getElementById('taskmgr-titlebar');
+  const taskmgrCpuVal = document.getElementById('taskmgr-cpu-val');
+  const taskmgrCpuCanvas = document.getElementById('taskmgr-cpu-canvas');
+  const taskmgrCpuCtx = taskmgrCpuCanvas.getContext('2d');
+  const taskmgrRamVal = document.getElementById('taskmgr-ram-val');
+  const taskmgrRamFill = document.getElementById('taskmgr-ram-fill');
+  const taskmgrGpuVal = document.getElementById('taskmgr-gpu-val');
+  const taskmgrGpuFill = document.getElementById('taskmgr-gpu-fill');
+
+  const cpuHistory = new Array(36).fill(12);
+
+  btnTaskmgrToggle.addEventListener('pointerdown', (e) => {
+    e.stopPropagation();
+    const isHidden = taskmgrWindow.style.display === 'none';
+    taskmgrWindow.style.display = isHidden ? 'flex' : 'none';
+    btnTaskmgrToggle.classList.toggle('active', isHidden);
+    if (isHidden) {
+      taskmgrWindow.style.left = `${Math.max(20, (window.innerWidth - 380) * 0.5)}px`;
+      taskmgrWindow.style.top = `${Math.max(20, (window.innerHeight - 300) * 0.4)}px`;
+    }
+  });
+
+  btnTaskmgrClose.addEventListener('pointerdown', (e) => {
+    e.stopPropagation();
+    taskmgrWindow.style.display = 'none';
+    btnTaskmgrToggle.classList.remove('active');
+  });
+
+  makeElementDraggable(taskmgrWindow, taskmgrTitlebar);
+
+  // Native Lively Hardware Information Listener
+  window.livelySystemInformation = function (data) {
+    if (!data) return;
+    let parsed = data;
+    if (typeof data === 'string') {
+      try { parsed = JSON.parse(data); } catch (e) { return; }
+    }
+
+    const cpu = Math.round(parsed.CurrentCpu || parsed.cpuUsage || parsed.cpu || 0);
+    const ram = Math.round(
+      parsed.CurrentRam && parsed.TotalRam
+        ? (parsed.CurrentRam / parsed.TotalRam) * 100
+        : (parsed.ramUsage || parsed.memory || 45)
+    );
+    const gpu = Math.round(parsed.CurrentGpu3D || parsed.gpuUsage || parsed.gpu || 22);
+
+    updateTaskMgrUI(cpu, ram, gpu);
+  };
+
+  function updateTaskMgrUI(cpu, ram, gpu) {
+    taskmgrCpuVal.textContent = `${cpu}%`;
+    taskmgrRamVal.textContent = `${ram}%`;
+    taskmgrRamFill.style.width = `${ram}%`;
+    taskmgrGpuVal.textContent = `${gpu}%`;
+    taskmgrGpuFill.style.width = `${gpu}%`;
+
+    cpuHistory.push(cpu);
+    if (cpuHistory.length > 36) cpuHistory.shift();
+    renderCpuGraph();
+  }
+
+  function renderCpuGraph() {
+    const w = taskmgrCpuCanvas.width;
+    const h = taskmgrCpuCanvas.height;
+    taskmgrCpuCtx.fillStyle = '#000000';
+    taskmgrCpuCtx.fillRect(0, 0, w, h);
+
+    // Green CRT oscilloscope grid
+    taskmgrCpuCtx.strokeStyle = 'rgba(0, 150, 0, 0.35)';
+    taskmgrCpuCtx.lineWidth = 1;
+    for (let x = 0; x < w; x += 20) {
+      taskmgrCpuCtx.beginPath();
+      taskmgrCpuCtx.moveTo(x, 0);
+      taskmgrCpuCtx.lineTo(x, h);
+      taskmgrCpuCtx.stroke();
+    }
+    for (let y = 0; y < h; y += 15) {
+      taskmgrCpuCtx.beginPath();
+      taskmgrCpuCtx.moveTo(0, y);
+      taskmgrCpuCtx.lineTo(w, y);
+      taskmgrCpuCtx.stroke();
+    }
+
+    // Oscilloscope CPU trace
+    taskmgrCpuCtx.strokeStyle = '#00FF66';
+    taskmgrCpuCtx.lineWidth = 2;
+    taskmgrCpuCtx.beginPath();
+    const stepX = w / (cpuHistory.length - 1);
+    cpuHistory.forEach((val, i) => {
+      const cx = i * stepX;
+      const cy = h - (val / 100) * (h - 6) - 3;
+      if (i === 0) taskmgrCpuCtx.moveTo(cx, cy);
+      else taskmgrCpuCtx.lineTo(cx, cy);
+    });
+    taskmgrCpuCtx.stroke();
+  }
+
+  // Standalone simulated hardware metrics ticker
+  setInterval(() => {
+    if (isPaused) return;
+    const simCpu = Math.max(5, Math.min(95, Math.round(15 + Math.random() * 25 + Math.sin(Date.now() * 0.001) * 10)));
+    const simRam = Math.max(30, Math.min(85, Math.round(44 + Math.sin(Date.now() * 0.0005) * 6)));
+    const simGpu = Math.max(8, Math.min(75, Math.round(20 + Math.random() * 18)));
+    updateTaskMgrUI(simCpu, simRam, simGpu);
+  }, 1000);
+
+  /* ==========================================================================
+     11. Milestone 4: Daily Y2K Productivity Widgets (Clock & To-Do)
+     ========================================================================== */
+
+  const widgetClock = document.getElementById('widget-clock');
+  const widgetTodo = document.getElementById('widget-todo');
+  const btnWidgetsToggle = document.getElementById('btn-widgets-toggle');
+  const btnClockClose = document.getElementById('btn-clock-close');
+  const btnTodoClose = document.getElementById('btn-todo-close');
+
+  btnWidgetsToggle.addEventListener('pointerdown', (e) => {
+    e.stopPropagation();
+    const isHidden = widgetClock.style.display === 'none';
+    widgetClock.style.display = isHidden ? 'block' : 'none';
+    widgetTodo.style.display = isHidden ? 'block' : 'none';
+    btnWidgetsToggle.classList.toggle('active', isHidden);
+    if (isHidden) {
+      widgetClock.style.left = '24px';
+      widgetClock.style.top = '36px';
+      widgetTodo.style.left = `${window.innerWidth - 320}px`;
+      widgetTodo.style.top = '36px';
+    }
+  });
+
+  btnClockClose.addEventListener('pointerdown', (e) => {
+    e.stopPropagation();
+    widgetClock.style.display = 'none';
+  });
+
+  btnTodoClose.addEventListener('pointerdown', (e) => {
+    e.stopPropagation();
+    widgetTodo.style.display = 'none';
+  });
+
+  makeElementDraggable(widgetClock, document.getElementById('widget-clock-titlebar'));
+  makeElementDraggable(widgetTodo, document.getElementById('widget-todo-titlebar'));
+
+  // Clock & Calendar Logic
+  const clockDigitalTime = document.getElementById('clock-digital-time');
+  const clockDigitalDate = document.getElementById('clock-digital-date');
+  const miniCalendarBody = document.getElementById('mini-calendar-body');
+
+  function updateClockDisplay() {
+    const now = new Date();
+    clockDigitalTime.textContent = now.toLocaleTimeString();
+    clockDigitalDate.textContent = now.toLocaleDateString(undefined, {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  }
+
+  function renderMiniCalendar() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth();
+    const today = now.getDate();
+
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    miniCalendarBody.innerHTML = '';
+    let row = document.createElement('tr');
+
+    for (let i = 0; i < firstDay; i++) {
+      const cell = document.createElement('td');
+      row.appendChild(cell);
+    }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      if ((firstDay + day - 1) % 7 === 0 && day !== 1) {
+        miniCalendarBody.appendChild(row);
+        row = document.createElement('tr');
+      }
+      const cell = document.createElement('td');
+      cell.textContent = day;
+      if (day === today) cell.className = 'today';
+      row.appendChild(cell);
+    }
+    miniCalendarBody.appendChild(row);
+  }
+
+  updateClockDisplay();
+  renderMiniCalendar();
+  setInterval(updateClockDisplay, 1000);
+
+  // Persistent To-Do List
+  const todoForm = document.getElementById('todo-form');
+  const todoInput = document.getElementById('todo-input');
+  const todoList = document.getElementById('todo-list');
+  const todoCounter = document.getElementById('todo-counter');
+  const btnTodoClear = document.getElementById('btn-todo-clear');
+
+  let todos = [];
+  try {
+    const saved = localStorage.getItem('pony_todos');
+    if (saved) todos = JSON.parse(saved);
+  } catch (e) {
+    todos = [];
+  }
+
+  if (todos.length === 0) {
+    todos = [
+      { id: 1, text: 'Bake cupcakes for Pinkie', done: true },
+      { id: 2, text: 'Organize library with Twilight', done: false }
+    ];
+  }
+
+  function saveAndRenderTodos() {
+    localStorage.setItem('pony_todos', JSON.stringify(todos));
+    todoList.innerHTML = '';
+
+    todos.forEach((todo) => {
+      const li = document.createElement('li');
+      li.className = `todo-item ${todo.done ? 'completed' : ''}`;
+
+      const label = document.createElement('label');
+      const chk = document.createElement('input');
+      chk.type = 'checkbox';
+      chk.checked = todo.done;
+      chk.addEventListener('change', () => {
+        todo.done = chk.checked;
+        saveAndRenderTodos();
+      });
+
+      const span = document.createElement('span');
+      span.textContent = todo.text;
+
+      label.appendChild(chk);
+      label.appendChild(span);
+
+      const delBtn = document.createElement('button');
+      delBtn.type = 'button';
+      delBtn.className = 'todo-del-btn';
+      delBtn.textContent = '×';
+      delBtn.setAttribute('aria-label', `Delete task: ${todo.text}`);
+      delBtn.addEventListener('pointerdown', (e) => {
+        e.stopPropagation();
+        todos = todos.filter((t) => t.id !== todo.id);
+        saveAndRenderTodos();
+      });
+
+      li.appendChild(label);
+      li.appendChild(delBtn);
+      todoList.appendChild(li);
     });
 
-    placedStickers.length = 0;
-    currentStickerCount = 0;
-    isCascadeActive = false;
-
-    // 4. Pinkie joyful bounce
-    triggerPinkieReaction();
+    const doneCount = todos.filter((t) => t.done).length;
+    todoCounter.textContent = `${doneCount} of ${todos.length} completed`;
   }
+
+  todoForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const val = todoInput.value.trim();
+    if (!val) return;
+    todos.push({
+      id: Date.now(),
+      text: val,
+      done: false
+    });
+    todoInput.value = '';
+    saveAndRenderTodos();
+  });
+
+  btnTodoClear.addEventListener('pointerdown', (e) => {
+    e.stopPropagation();
+    todos = todos.filter((t) => !t.done);
+    saveAndRenderTodos();
+  });
+
+  saveAndRenderTodos();
+
+  /* ==========================================================================
+     12. Milestone 4: Mode Toggle (Party Mode vs Chill Mode)
+     ========================================================================== */
+
+  const btnModeToggle = document.getElementById('btn-mode-toggle');
+  const iconModeParty = document.getElementById('icon-mode-party');
+  const iconModeChill = document.getElementById('icon-mode-chill');
+
+  function updateModeUI() {
+    document.body.classList.toggle('chill-mode', isChillMode);
+    if (isChillMode) {
+      iconModeParty.style.display = 'none';
+      iconModeChill.style.display = 'block';
+    } else {
+      iconModeParty.style.display = 'block';
+      iconModeChill.style.display = 'none';
+    }
+    localStorage.setItem('pony_wallpaper_mode', isChillMode ? 'chill' : 'party');
+  }
+
+  btnModeToggle.addEventListener('pointerdown', (e) => {
+    e.stopPropagation();
+    isChillMode = !isChillMode;
+    updateModeUI();
+    soundFX.playStickerPop();
+  });
+
+  updateModeUI();
+
+  /* ==========================================================================
+     13. Milestone 3: Mane 6 Fullscreen Signature Screen Effects
+     ========================================================================== */
+
+  const signatureEffectsContainer = document.getElementById('signature-effects-container');
+  const resetBurstContainer = document.getElementById('reset-burst-container');
 
   function triggerRandomSignatureEffect() {
     const effects = ['rainbow', 'twilight', 'fluttershy', 'rarity', 'applejack'];
@@ -1255,9 +1611,7 @@
     signatureEffectsContainer.innerHTML = '';
 
     if (name === 'rainbow') {
-      // 1. Rainbow Dash: High-speed rainbow streak + screen shockwave pulse
       soundFX.playRainbowDashSFX();
-
       const streak = document.createElement('div');
       streak.className = 'rd-rainbow-streak';
       signatureEffectsContainer.appendChild(streak);
@@ -1265,31 +1619,25 @@
       const shockwave = document.createElement('div');
       shockwave.className = 'rd-shockwave';
       signatureEffectsContainer.appendChild(shockwave);
-
-      setTimeout(() => signatureEffectsContainer.innerHTML = '', 950);
+      setTimeout(() => { signatureEffectsContainer.innerHTML = ''; }, 950);
 
     } else if (name === 'twilight') {
-      // 2. Twilight Sparkle: Magic Star Ring Burst
       soundFX.playTwilightSFX();
-
       const glow = document.createElement('div');
       glow.className = 'twi-aura-glow';
       signatureEffectsContainer.appendChild(glow);
 
       const ring = document.createElement('div');
       ring.className = 'twi-magic-ring';
-
       const starCount = 14;
       for (let i = 0; i < starCount; i++) {
         const star = document.createElement('div');
         star.className = 'twi-orbit-star';
-
         const angle = (i / starCount) * Math.PI * 2;
         const dist = 220 + Math.random() * 260;
         const tx = Math.cos(angle) * dist;
         const ty = Math.sin(angle) * dist;
         const rot = (Math.random() - 0.5) * 720;
-
         star.style.setProperty('--tx', `${tx}px`);
         star.style.setProperty('--ty', `${ty}px`);
         star.style.setProperty('--rot', `${rot}deg`);
@@ -1297,98 +1645,81 @@
         const sz = 32 + Math.random() * 20;
         star.innerHTML = `
           <svg width="${sz}" height="${sz}" viewBox="0 0 100 100">
-            <polygon points="50,10 60,35 85,35 65,52 75,75 50,60 25,75 35,52 15,35 40,35" fill="#E91E63" stroke="#FFFFFF" stroke-width="3"/>
+            <polygon points="50,0 60,38 100,50 60,62 50,100 40,62 0,50 40,38" fill="#FFF9A6" stroke="#9C27B0" stroke-width="4"/>
           </svg>
         `;
         ring.appendChild(star);
       }
       signatureEffectsContainer.appendChild(ring);
-      setTimeout(() => signatureEffectsContainer.innerHTML = '', 1300);
+      setTimeout(() => { signatureEffectsContainer.innerHTML = ''; }, 1300);
 
     } else if (name === 'fluttershy') {
-      // 3. Fluttershy: Gentle flock of butterflies fluttering upward
       soundFX.playFluttershySFX();
-
-      const butterflyCount = 18;
-      const butterflyColors = ['#FF80AB', '#FFE082', '#80DEEA', '#F48FB1'];
-
-      for (let i = 0; i < butterflyCount; i++) {
+      const count = 12;
+      for (let i = 0; i < count; i++) {
         const bf = document.createElement('div');
         bf.className = 'fs-butterfly';
-
-        const sx = Math.random() * window.innerWidth;
-        const sy = window.innerHeight * (0.65 + Math.random() * 0.35);
+        const sx = Math.random() * window.innerWidth * 0.8;
+        const sy = window.innerHeight + 40;
         const ex = sx + (Math.random() - 0.5) * 350;
         const ey = -80;
-
-        const dur = 2.2 + Math.random() * 1.2;
-        const scale = 0.8 + Math.random() * 0.7;
-        const rot = (Math.random() - 0.5) * 40;
+        const dur = 2.0 + Math.random() * 1.0;
+        const scale = 0.75 + Math.random() * 0.5;
 
         bf.style.setProperty('--sx', `${sx}px`);
         bf.style.setProperty('--sy', `${sy}px`);
         bf.style.setProperty('--ex', `${ex}px`);
         bf.style.setProperty('--ey', `${ey}px`);
         bf.style.setProperty('--duration', `${dur}s`);
-        bf.style.setProperty('--sc', `${scale}`);
-        bf.style.setProperty('--base-rot', `${rot}deg`);
+        bf.style.setProperty('--sc', scale.toString());
 
-        const color = butterflyColors[i % butterflyColors.length];
         bf.innerHTML = `
           <div class="fs-wing-flap">
             <svg width="42" height="42" viewBox="0 0 100 100">
-              <ellipse cx="32" cy="40" rx="20" ry="16" fill="${color}" stroke="#FFFFFF" stroke-width="3" transform="rotate(-25 32 40)"/>
-              <ellipse cx="68" cy="40" rx="20" ry="16" fill="${color}" stroke="#FFFFFF" stroke-width="3" transform="rotate(25 68 40)"/>
-              <ellipse cx="38" cy="62" rx="14" ry="12" fill="${color}" stroke="#FFFFFF" stroke-width="2.5" transform="rotate(-15 38 62)"/>
-              <ellipse cx="62" cy="62" rx="14" ry="12" fill="${color}" stroke="#FFFFFF" stroke-width="2.5" transform="rotate(15 62 62)"/>
-              <ellipse cx="50" cy="50" rx="5" ry="22" fill="#00E5FF"/>
+              <ellipse cx="36" cy="40" rx="28" ry="18" fill="#00E5FF" opacity="0.85" transform="rotate(-30 36 40)"/>
+              <ellipse cx="64" cy="40" rx="28" ry="18" fill="#00E5FF" opacity="0.85" transform="rotate(30 64 40)"/>
+              <ellipse cx="40" cy="62" rx="20" ry="12" fill="#FF4081" opacity="0.75" transform="rotate(-20 40 62)"/>
+              <ellipse cx="60" cy="62" rx="20" ry="12" fill="#FF4081" opacity="0.75" transform="rotate(20 60 62)"/>
+              <line x1="50" y1="20" x2="50" y2="78" stroke="#333" stroke-width="5" stroke-linecap="round"/>
             </svg>
           </div>
         `;
         signatureEffectsContainer.appendChild(bf);
       }
-      setTimeout(() => signatureEffectsContainer.innerHTML = '', 3500);
+      setTimeout(() => { signatureEffectsContainer.innerHTML = ''; }, 3200);
 
     } else if (name === 'rarity') {
-      // 4. Rarity: Sparkling diamond & crystal shower
       soundFX.playRaritySFX();
-
-      const gemCount = 24;
-      for (let i = 0; i < gemCount; i++) {
+      const count = 16;
+      for (let i = 0; i < count; i++) {
         const dia = document.createElement('div');
         dia.className = 'rarity-diamond';
-
         const dx = Math.random() * window.innerWidth;
-        const drift = (Math.random() - 0.5) * 120;
-        const dur = 1.4 + Math.random() * 1.0;
-        const scale = 0.7 + Math.random() * 0.7;
-        const drot = (Math.random() - 0.5) * 720;
+        const fallDur = 1.4 + Math.random() * 0.8;
+        const drift = (Math.random() - 0.5) * 160;
+        const ds = 0.6 + Math.random() * 0.7;
 
         dia.style.setProperty('--dx', `${dx}px`);
+        dia.style.setProperty('--fall-dur', `${fallDur}s`);
         dia.style.setProperty('--drift', `${drift}px`);
-        dia.style.setProperty('--fall-dur', `${dur}s`);
-        dia.style.setProperty('--ds', `${scale}`);
-        dia.style.setProperty('--drot', `${drot}deg`);
+        dia.style.setProperty('--ds', ds.toString());
 
         dia.innerHTML = `
           <svg width="44" height="44" viewBox="0 0 100 100">
-            <polygon points="50,15 72,38 50,62 28,38" fill="#00E5FF" stroke="#FFFFFF" stroke-width="3"/>
-            <polygon points="50,22 66,38 50,54 34,38" fill="#E0F7FA"/>
+            <polygon points="50,5 95,50 50,95 5,50" fill="#E1F5FE" stroke="#0288D1" stroke-width="4"/>
+            <polygon points="50,22 78,50 50,78 22,50" fill="#FFFFFF" opacity="0.85"/>
           </svg>
         `;
         signatureEffectsContainer.appendChild(dia);
       }
-      setTimeout(() => signatureEffectsContainer.innerHTML = '', 2600);
+      setTimeout(() => { signatureEffectsContainer.innerHTML = ''; }, 2400);
 
-    } else {
-      // 5. Applejack: Bouncing golden & red apples
+    } else if (name === 'applejack') {
       soundFX.playApplejackSFX();
-
       const appleCount = 8;
       for (let i = 0; i < appleCount; i++) {
         const apple = document.createElement('div');
         apple.className = 'aj-bouncing-apple';
-
         const ax = (window.innerWidth / (appleCount + 1)) * (i + 0.5) - 60;
         const dur = 1.4 + (i % 3) * 0.2;
         const isGolden = i % 3 === 0;
@@ -1407,7 +1738,7 @@
         `;
         signatureEffectsContainer.appendChild(apple);
       }
-      setTimeout(() => signatureEffectsContainer.innerHTML = '', 2200);
+      setTimeout(() => { signatureEffectsContainer.innerHTML = ''; }, 2200);
     }
   }
 
@@ -1437,20 +1768,11 @@
       const size = 16 + Math.random() * 18;
       const color = colors[i % colors.length];
 
-      if (i % 2 === 0) {
-        particle.innerHTML = `
-          <svg width="${size}" height="${size}" viewBox="0 0 24 24">
-            <path d="M12 0 Q12 12 24 12 Q12 12 12 24 Q12 12 0 12 Q12 12 12 0 Z" fill="${color}" />
-          </svg>
-        `;
-      } else {
-        particle.innerHTML = `
-          <svg width="${size}" height="${size}" viewBox="0 0 24 24">
-            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="${color}"/>
-          </svg>
-        `;
-      }
-
+      particle.innerHTML = `
+        <svg width="${size}" height="${size}" viewBox="0 0 24 24">
+          <path d="M12 0 Q12 12 24 12 Q12 12 12 24 Q12 12 0 12 Q12 12 12 0 Z" fill="${color}" />
+        </svg>
+      `;
       resetBurstContainer.appendChild(particle);
     }
 
@@ -1460,7 +1782,44 @@
   }
 
   /* ==========================================================================
-     9. Minimalist Live Wallpaper UI Controls
+     14. Milestone 2: Lively Wallpaper Native Property Integration
+     ========================================================================== */
+
+  window.livelyPropertyListener = function (name, val) {
+    if (name === 'characterSelect') {
+      const ponyList = ['pinkie', 'twilight', 'rainbow', 'fluttershy', 'rarity', 'applejack'];
+      let selectedId = 'pinkie';
+      if (typeof val === 'number' && ponyList[val]) {
+        selectedId = ponyList[val];
+      } else if (typeof val === 'string') {
+        const lower = val.toLowerCase();
+        const match = ponyList.find((p) => lower.includes(p));
+        if (match) selectedId = match;
+      }
+      switchMainCharacter(selectedId);
+
+    } else if (name === 'popupThreshold') {
+      popupStickerThreshold = Math.max(3, Math.min(20, parseInt(val, 10) || 7));
+
+    } else if (name === 'ribbonSpeed') {
+      const pct = Math.max(10, Math.min(300, parseInt(val, 10) || 100));
+      const dur = Math.max(5, Math.round(22 * (100 / pct)));
+      document.documentElement.style.setProperty('--ribbon-scroll-duration', `${dur}s`);
+
+    } else if (name === 'starDensity') {
+      starDensity = Math.max(10, Math.min(120, parseInt(val, 10) || 42));
+      initStars();
+
+    } else if (name === 'muteAudio') {
+      if (soundFX.isMuted !== Boolean(val)) {
+        soundFX.toggleMute();
+        updateMuteIcons(soundFX.isMuted);
+      }
+    }
+  };
+
+  /* ==========================================================================
+     15. Controls & Keyboard Accessibility
      ========================================================================== */
 
   const btnPartyGuest = document.getElementById('btn-party-guest');
@@ -1481,13 +1840,10 @@
 
   updateMuteIcons(soundFX.isMuted);
 
-  // Party Guest Button
   btnPartyGuest.addEventListener('pointerdown', (e) => {
     e.stopPropagation();
     soundFX.init();
-    triggerPinkieReaction();
-
-    // Trigger random signature effect + spawn a surprise guest cameo window
+    triggerPonyReaction();
     triggerRandomSignatureEffect();
 
     const safeLeft = 20 + Math.random() * 45;
@@ -1499,36 +1855,81 @@
     requestAnimationFrame(() => win.classList.add('is-open'));
   });
 
-  // Sound Toggle Button
   btnSoundToggle.addEventListener('pointerdown', (e) => {
     e.stopPropagation();
     soundFX.init();
     const muted = soundFX.toggleMute();
     updateMuteIcons(muted);
-    if (!muted) {
-      soundFX.playStickerPop();
-    }
+    if (!muted) soundFX.playStickerPop();
   });
 
-  // Manual Reset Button
   btnManualReset.addEventListener('pointerdown', (e) => {
     e.stopPropagation();
     soundFX.init();
-
     openWindows.forEach((w) => w.remove());
     openWindows = [];
-
-    completeLoopReset();
+    triggerPartyCannonReset();
   });
 
-  // Lively Wallpaper & Wallpaper Engine Property Support
-  window.livelyPropertyListener = function (name, val) {
-    if (name === 'muteAudio') {
-      if (soundFX.isMuted !== val) {
-        soundFX.toggleMute();
-        updateMuteIcons(soundFX.isMuted);
+  // Mane 6 Dock Buttons
+  const dockButtons = document.querySelectorAll('.pony-dock-btn');
+  dockButtons.forEach((btn) => {
+    btn.addEventListener('pointerdown', (e) => {
+      e.stopPropagation();
+      soundFX.init();
+      const ponyId = btn.dataset.pony;
+      if (ponyId) switchMainCharacter(ponyId);
+    });
+  });
+
+  // Keyboard accessibility: Escape closes topmost window
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (openWindows.length > 0) {
+        closeRetroWindow(openWindows[openWindows.length - 1]);
+      } else if (taskmgrWindow.style.display !== 'none') {
+        taskmgrWindow.style.display = 'none';
+        btnTaskmgrToggle.classList.remove('active');
+      } else if (widgetClock.style.display !== 'none' || widgetTodo.style.display !== 'none') {
+        widgetClock.style.display = 'none';
+        widgetTodo.style.display = 'none';
+        btnWidgetsToggle.classList.remove('active');
       }
     }
-  };
+  });
+
+  /* ==========================================================================
+     16. Main RAF Render Loop (Parallax Lerp, Starfield & Winamp Visualizer)
+     ========================================================================== */
+
+  function renderLoop() {
+    if (!isPaused) {
+      // 3D Parallax & Cursor Gaze Tracking Lerp
+      currentParallaxX += (targetParallaxX - currentParallaxX) * 0.08;
+      currentParallaxY += (targetParallaxY - currentParallaxY) * 0.08;
+
+      document.documentElement.style.setProperty('--parallax-bg-x', `${-currentParallaxX * 14}px`);
+      document.documentElement.style.setProperty('--parallax-bg-y', `${-currentParallaxY * 10}px`);
+      document.documentElement.style.setProperty('--parallax-ribbon-x', `${-currentParallaxX * 22}px`);
+      document.documentElement.style.setProperty('--parallax-ribbon-y', `${-currentParallaxY * 8}px`);
+      document.documentElement.style.setProperty('--parallax-char-x', `${currentParallaxX * 18}px`);
+      document.documentElement.style.setProperty('--parallax-char-y', `${currentParallaxY * 12}px`);
+      document.documentElement.style.setProperty('--parallax-eye-x', `${currentParallaxX * 9}px`);
+      document.documentElement.style.setProperty('--parallax-eye-y', `${currentParallaxY * 7}px`);
+
+      // Render Offscreen Starfield
+      renderStars();
+
+      // Render Winamp Equalizer
+      renderWinampEQ();
+    }
+    animFrameId = requestAnimationFrame(renderLoop);
+  }
+
+  // Startup Initialization
+  preRenderStarCache();
+  window.addEventListener('resize', resizeStarCanvas);
+  resizeStarCanvas();
+  animFrameId = requestAnimationFrame(renderLoop);
 
 })();

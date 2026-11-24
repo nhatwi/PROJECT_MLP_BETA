@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="style.css">
   <link rel="icon" type="image/png" href="assets/cm-pinkie.png">
 </head>
-<body>
+<body data-pony="pinkie">
   <!-- Custom Y2K Pixel Cursor -->
   <div id="retro-cursor" class="retro-cursor" aria-hidden="true">
     <svg viewBox="0 0 24 24" width="26" height="26">
@@ -29,15 +29,27 @@
   <!-- Mane 6 Fullscreen Signature Effects Layer -->
   <div id="signature-effects-container" class="signature-effects-container" aria-hidden="true"></div>
 
-  <!-- LAYER 1: Dynamic Y2K Background -->
+  <!-- Milestone 3: Elements of Harmony Combo Overlay -->
+  <div id="harmony-combo-container" class="harmony-combo-container" aria-hidden="true">
+    <div class="harmony-rainbow-rays"></div>
+    <div class="harmony-seal-ring">
+      <svg viewBox="0 0 200 200" width="80%" height="80%" aria-hidden="true">
+        <polygon points="100,10 125,75 195,75 140,115 160,185 100,145 40,185 60,115 5,75 75,75" fill="none" stroke="#FFD700" stroke-width="4"/>
+        <circle cx="100" cy="100" r="45" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-dasharray="6,4"/>
+        <circle cx="100" cy="100" r="18" fill="#FFF9A6" stroke="#FFA000" stroke-width="2"/>
+      </svg>
+    </div>
+    <div class="harmony-banner">✨ Elements of Harmony Harmonized! ✨</div>
+  </div>
+
+  <!-- LAYER 1: Dynamic Y2K Background Scene -->
   <div class="background-scene" id="bg-scene">
     <!-- Drifting Y2K Starfield Background -->
     <canvas id="starfield-canvas" class="starfield-canvas"></canvas>
 
-    <!-- Gently Curved / Wavy Pastel-Pink Argyle Ribbon -->
+    <!-- Wavy Pastel Argyle Ribbon Band -->
     <div class="ribbon-band-wrapper" id="ribbon-wrapper">
       <div class="ribbon-band-track" id="ribbon-track">
-        <!-- Repeating Argyle Wave Segments for Seamless Infinite Loop -->
         <div class="argyle-wave-segment"></div>
         <div class="argyle-wave-segment"></div>
         <div class="argyle-wave-segment"></div>
@@ -45,7 +57,7 @@
     </div>
   </div>
 
-  <!-- LAYER 2 & 3: Center Character (Pinkie Pie) & Interactive Sticker Canvas -->
+  <!-- LAYER 2 & 3: Center Character & Interactive Sticker Canvas -->
   <main class="main-stage" id="main-stage">
     <div class="pinkie-wrapper" id="pinkie-wrapper">
       <!-- Bobbing / Breathing Anchor -->
@@ -53,19 +65,54 @@
         
         <!-- Character Visuals Container -->
         <div class="pinkie-visual-box" id="pinkie-visual-box">
-          <!-- Real PNG Images -->
-          <img id="pinkie-idle-img" 
-               class="pinkie-img pinkie-idle-state" 
-               src="assets/pinkie-idle.png" 
-               alt="Pinkie Pie" 
-               draggable="false">
-          <img id="pinkie-blink-img" 
-               class="pinkie-img pinkie-blink-state" 
-               src="assets/pinkie-blink.png" 
-               alt="Pinkie Pie Happy" 
-               draggable="false">
+          <div class="pinkie-rig-frame" id="pinkie-rig-frame">
+            <img id="pinkie-idle-img"
+                 class="pinkie-img pinkie-idle-state"
+                 src="assets/pinkie-idle.png"
+                 alt="Main Pony"
+                 draggable="false">
 
-          <!-- Bulletproof Inline SVG Fallback (Hidden by default, shown if images fail) -->
+            <!-- Vector Face Rig -->
+            <svg id="pinkie-face-rig" class="pinkie-face-rig" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+              <defs>
+                <radialGradient id="cheekBlushGrad" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="var(--character-blush-1, #FF4F93)" stop-opacity="0.6" />
+                  <stop offset="65%" stop-color="var(--character-blush-2, #FF85B3)" stop-opacity="0.25" />
+                  <stop offset="100%" stop-color="var(--character-blush-2, #FF85B3)" stop-opacity="0" />
+                </radialGradient>
+              </defs>
+
+              <!-- Cheeks Blush -->
+              <g class="expr-blush" id="rig-blush-group">
+                <ellipse id="rig-blush-left" cx="22.5" cy="57.5" rx="6.8" ry="3.8" fill="url(#cheekBlushGrad)" />
+                <ellipse id="rig-blush-right" cx="69.5" cy="57.5" rx="6.8" ry="3.8" fill="url(#cheekBlushGrad)" />
+              </g>
+
+              <!-- Left Eyelid -->
+              <g class="expr-eye-left" id="rig-eye-left-group">
+                <ellipse id="rig-eye-patch-left" cx="29.5" cy="48.5" rx="9.5" ry="10.2" class="coat-patch" />
+                <path id="rig-lash-left" d="M 21.5 50.5 Q 29.5 41.2 37.5 49.5" fill="none" stroke="#2B1422" stroke-width="1.6" stroke-linecap="round" />
+                <path d="M 22.5 48.5 L 19.2 46.0" stroke="#2B1422" stroke-width="1.3" stroke-linecap="round" />
+                <path d="M 26.5 45.2 L 25.0 42.0" stroke="#2B1422" stroke-width="1.3" stroke-linecap="round" />
+              </g>
+
+              <!-- Right Eyelid -->
+              <g class="expr-eye-right" id="rig-eye-right-group">
+                <ellipse id="rig-eye-patch-right" cx="64.5" cy="48.5" rx="9.5" ry="10.2" class="coat-patch" />
+                <path id="rig-lash-right" d="M 56.5 49.5 Q 64.5 41.2 72.5 50.5" fill="none" stroke="#2B1422" stroke-width="1.6" stroke-linecap="round" />
+                <path d="M 71.5 48.5 L 74.8 46.0" stroke="#2B1422" stroke-width="1.3" stroke-linecap="round" />
+                <path d="M 67.5 45.2 L 69.0 42.0" stroke="#2B1422" stroke-width="1.3" stroke-linecap="round" />
+              </g>
+
+              <!-- Starry Eyes Sparkles -->
+              <g class="expr-star-eyes" id="rig-star-eyes-group">
+                <path id="rig-star-eye-left" d="M 29.5 42.5 Q 29.5 48 35.0 48 Q 29.5 48 29.5 53.5 Q 29.5 48 24.0 48 Q 29.5 48 29.5 42.5 Z" fill="#FFF9A6" stroke="#FF9D00" stroke-width="0.45" />
+                <path id="rig-star-eye-right" d="M 64.5 42.5 Q 64.5 48 70.0 48 Q 64.5 48 64.5 53.5 Q 64.5 48 59.0 48 Q 64.5 48 64.5 42.5 Z" fill="#FFF9A6" stroke="#FF9D00" stroke-width="0.45" />
+              </g>
+            </svg>
+          </div>
+
+          <!-- Inline SVG Fallback -->
           <div id="pinkie-svg-fallback" class="pinkie-svg-fallback" style="display: none;">
             <svg viewBox="0 0 400 480" width="100%" height="100%" id="fallback-svg-node">
               <defs>
@@ -85,7 +132,6 @@
                 </linearGradient>
               </defs>
 
-              <!-- Back Mane Curls -->
               <g class="svg-back-mane">
                 <circle cx="120" cy="180" r="70" fill="url(#maneGrad)" stroke="#A00050" stroke-width="5" />
                 <circle cx="280" cy="180" r="70" fill="url(#maneGrad)" stroke="#A00050" stroke-width="5" />
@@ -94,66 +140,52 @@
                 <circle cx="200" cy="110" r="75" fill="url(#maneGrad)" stroke="#A00050" stroke-width="5" />
               </g>
 
-              <!-- Neck and Shoulders -->
               <path d="M140 370 Q130 450 110 480 L290 480 Q270 450 260 370 Z" fill="url(#coatGrad)" stroke="#B55B86" stroke-width="5" />
-
-              <!-- Head Base -->
               <ellipse cx="200" cy="290" rx="95" ry="90" fill="url(#coatGrad)" stroke="#B55B86" stroke-width="5" />
 
-              <!-- Ears -->
-              <polygon points="120,240 100,160 160,200" fill="url(#coatGrad)" stroke="#B55B86" stroke-width="5" stroke-linejoin="round"/>
+              <polygon points="120,240 100,160 160,200" fill="url(#coatGrad)" stroke="#B55B86" stroke-width="5" stroke-linejoin="round" />
               <polygon points="122,230 112,175 150,202" fill="#FFA5CA" />
-              <polygon points="280,240 300,160 240,200" fill="url(#coatGrad)" stroke="#B55B86" stroke-width="5" stroke-linejoin="round"/>
+              <polygon points="280,240 300,160 240,200" fill="url(#coatGrad)" stroke="#B55B86" stroke-width="5" stroke-linejoin="round" />
               <polygon points="278,230 288,175 250,202" fill="#FFA5CA" />
 
-              <!-- Cute Cheeks Blush -->
               <ellipse cx="145" cy="330" rx="20" ry="12" fill="#FF8CB7" opacity="0.6" />
               <ellipse cx="255" cy="330" rx="20" ry="12" fill="#FF8CB7" opacity="0.6" />
 
-              <!-- Muzzle & Smile -->
               <ellipse cx="200" cy="338" rx="42" ry="28" fill="#FFD0E5" />
               <circle cx="193" cy="328" r="2.5" fill="#B55B86" />
               <circle cx="207" cy="328" r="2.5" fill="#B55B86" />
-              <path d="M185 342 Q200 365 215 342" fill="#C4195B" stroke="#8E0A3E" stroke-width="3" stroke-linecap="round"/>
+              <path d="M185 342 Q200 365 215 342" fill="#C4195B" stroke="#8E0A3E" stroke-width="3" stroke-linecap="round" />
               <path d="M190 348 Q200 360 210 348" fill="#FF82A9" />
 
-              <!-- Normal Open Eyes Group -->
               <g id="svg-normal-eyes">
-                <!-- Left Eye -->
                 <ellipse cx="160" cy="275" rx="24" ry="34" fill="#FFFFFF" stroke="#B55B86" stroke-width="3" />
                 <ellipse cx="164" cy="275" rx="18" ry="26" fill="url(#eyeGrad)" />
                 <ellipse cx="166" cy="275" rx="11" ry="17" fill="#0E2333" />
                 <circle cx="158" cy="265" r="7" fill="#FFFFFF" />
                 <circle cx="171" cy="285" r="3.5" fill="#FFFFFF" />
-                <!-- Left Eyelashes -->
                 <path d="M140 258 Q155 242 178 248" fill="none" stroke="#2B1422" stroke-width="4.5" stroke-linecap="round" />
                 <path d="M138 252 L132 245" stroke="#2B1422" stroke-width="3.5" stroke-linecap="round" />
                 <path d="M148 245 L144 237" stroke="#2B1422" stroke-width="3.5" stroke-linecap="round" />
 
-                <!-- Right Eye -->
                 <ellipse cx="240" cy="275" rx="24" ry="34" fill="#FFFFFF" stroke="#B55B86" stroke-width="3" />
                 <ellipse cx="236" cy="275" rx="18" ry="26" fill="url(#eyeGrad)" />
                 <ellipse cx="234" cy="275" rx="11" ry="17" fill="#0E2333" />
                 <circle cx="230" cy="265" r="7" fill="#FFFFFF" />
                 <circle cx="243" cy="285" r="3.5" fill="#FFFFFF" />
-                <!-- Right Eyelashes -->
                 <path d="M260 258 Q245 242 222 248" fill="none" stroke="#2B1422" stroke-width="4.5" stroke-linecap="round" />
                 <path d="M262 252 L268 245" stroke="#2B1422" stroke-width="3.5" stroke-linecap="round" />
                 <path d="M252 245 L256 237" stroke="#2B1422" stroke-width="3.5" stroke-linecap="round" />
               </g>
 
-              <!-- Happy Closed Eyes Group (> <) -->
               <g id="svg-closed-eyes" style="display: none;">
                 <path d="M138 275 Q160 255 182 275" fill="none" stroke="#2B1422" stroke-width="5" stroke-linecap="round" />
                 <path d="M138 275 L132 268" stroke="#2B1422" stroke-width="3.5" stroke-linecap="round" />
                 <path d="M148 266 L145 258" stroke="#2B1422" stroke-width="3.5" stroke-linecap="round" />
-
                 <path d="M218 275 Q240 255 262 275" fill="none" stroke="#2B1422" stroke-width="5" stroke-linecap="round" />
                 <path d="M262 275 L268 268" stroke="#2B1422" stroke-width="3.5" stroke-linecap="round" />
                 <path d="M252 266 L255 258" stroke="#2B1422" stroke-width="3.5" stroke-linecap="round" />
               </g>
 
-              <!-- Front Forehead Mane Curls -->
               <g class="svg-front-mane">
                 <circle cx="150" cy="180" r="45" fill="url(#maneGrad)" stroke="#A00050" stroke-width="4.5" />
                 <circle cx="220" cy="160" r="55" fill="url(#maneGrad)" stroke="#A00050" stroke-width="4.5" />
@@ -164,7 +196,7 @@
           </div>
         </div>
 
-        <!-- Slapped Stickers Pinned to Pinkie's Face (No hover tooltip) -->
+        <!-- Real Mouse Sticker Slapping Surface -->
         <div class="sticker-surface" id="sticker-surface"></div>
 
       </div>
@@ -174,36 +206,220 @@
   <!-- LAYER 4: Retro Windows 95/98 Cascade Pop-up Container -->
   <div class="retro-window-overlay" id="window-overlay" aria-live="polite"></div>
 
+  <!-- Milestone 2: Compact Toggleable Winamp Audio Visualizer -->
+  <aside class="winamp-visualizer" id="winamp-visualizer" aria-label="Audio Visualizer">
+    <div class="winamp-titlebar" id="winamp-titlebar">
+      <span>🎵 WinMLP Visualizer.exe</span>
+      <div class="retro-title-actions">
+        <button id="btn-winamp-min" class="retro-min-btn" title="Minimize / Expand" aria-label="Minimize">_</button>
+      </div>
+    </div>
+    <div class="winamp-body" id="winamp-body">
+      <div class="winamp-screen">
+        <canvas id="winamp-canvas" class="winamp-canvas" width="216" height="52"></canvas>
+      </div>
+      <div class="winamp-metrics">
+        <span id="winamp-bpm">BASS: 00%</span>
+        <span id="winamp-status">SPECTRUM: 128 BANDS</span>
+      </div>
+      <div class="winamp-controls">
+        <button type="button" id="btn-winamp-sim" class="winamp-btn" title="Toggle audio spectrum simulation test mode">SIM TEST</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Milestone 2: Live Hardware Monitor (Ponyville_TaskMgr.exe) -->
+  <div class="taskmgr-window" id="taskmgr-window" style="display: none;" role="dialog" aria-label="Ponyville Task Manager">
+    <div class="retro-window-titlebar titlebar-taskmgr" id="taskmgr-titlebar">
+      <div class="retro-title-text">
+        <span class="retro-title-icon">📈</span>
+        <span>Ponyville_TaskMgr.exe</span>
+      </div>
+      <div class="retro-title-actions">
+        <button type="button" class="retro-close-btn" id="btn-taskmgr-close" aria-label="Close Task Manager">×</button>
+      </div>
+    </div>
+    <div class="taskmgr-tabs">
+      <div class="taskmgr-tab active" id="tab-taskmgr-perf">Performance</div>
+      <div class="taskmgr-tab" id="tab-taskmgr-ponies">Mane 6 (6 active)</div>
+    </div>
+    <div class="taskmgr-content" id="taskmgr-content">
+      <div class="taskmgr-section-title">
+        <span>CPU Usage History</span>
+        <span id="taskmgr-cpu-val">12%</span>
+      </div>
+      <div class="taskmgr-graph-box">
+        <canvas id="taskmgr-cpu-canvas" class="taskmgr-graph-canvas" width="360" height="75"></canvas>
+      </div>
+      <div class="taskmgr-meters">
+        <div class="taskmgr-meter-group">
+          <div class="taskmgr-section-title">
+            <span>RAM Usage</span>
+            <span id="taskmgr-ram-val">42%</span>
+          </div>
+          <div class="taskmgr-progress-track">
+            <div id="taskmgr-ram-fill" class="taskmgr-progress-fill" style="width: 42%;"></div>
+          </div>
+        </div>
+        <div class="taskmgr-meter-group">
+          <div class="taskmgr-section-title">
+            <span>GPU 3D Load</span>
+            <span id="taskmgr-gpu-val">18%</span>
+          </div>
+          <div class="taskmgr-progress-track">
+            <div id="taskmgr-gpu-fill" class="taskmgr-progress-fill" style="width: 18%;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="taskmgr-statusbar">
+        <span>Threads: 6</span>
+        <span>Derpy Energy: Optimal</span>
+        <span>Uptime: Active</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Milestone 4: Daily Y2K Productivity Widgets -->
+  <!-- 1. Clock / Calendar Widget -->
+  <div class="y2k-widget" id="widget-clock" style="display: none;" role="region" aria-label="Clock and Calendar">
+    <div class="y2k-widget-titlebar" id="widget-clock-titlebar">
+      <span>⏰ Pony_Time.exe</span>
+      <button type="button" class="retro-close-btn" id="btn-clock-close" aria-label="Close Clock Widget">×</button>
+    </div>
+    <div class="y2k-widget-body">
+      <div class="clock-display">
+        <div class="clock-digital" id="clock-digital-time">12:00:00</div>
+        <div class="clock-date" id="clock-digital-date">Tuesday, Nov 24, 2026</div>
+      </div>
+      <table class="mini-calendar-table">
+        <thead>
+          <tr>
+            <th>Su</th><th>Mo</th><th>Tu</th><th>We</th><th>Th</th><th>Fr</th><th>Sa</th>
+          </tr>
+        </thead>
+        <tbody id="mini-calendar-body"></tbody>
+      </table>
+      <div class="pony-quote-box" id="pony-quote-text">"Laughter is the sweetest magic of all!" — Pinkie Pie</div>
+    </div>
+  </div>
+
+  <!-- 2. To-Do List Widget -->
+  <div class="y2k-widget" id="widget-todo" style="display: none;" role="region" aria-label="To Do List">
+    <div class="y2k-widget-titlebar" id="widget-todo-titlebar">
+      <span>📝 Equestria_Notes.exe</span>
+      <button type="button" class="retro-close-btn" id="btn-todo-close" aria-label="Close Todo Widget">×</button>
+    </div>
+    <div class="y2k-widget-body">
+      <form class="todo-input-bar" id="todo-form">
+        <input type="text" id="todo-input" class="todo-text-input" placeholder="New quest / task..." maxlength="50" aria-label="New task input">
+        <button type="submit" class="todo-add-btn" aria-label="Add task">+</button>
+      </form>
+      <ul class="todo-items-list" id="todo-list"></ul>
+      <div class="todo-summary">
+        <span id="todo-counter">0 of 0 completed</span>
+        <button type="button" id="btn-todo-clear" style="background:none;border:none;color:#888;cursor:pointer;font-size:10px;">Clear done</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Big Reset Celebration Particle Burst -->
   <div id="reset-burst-container" class="reset-burst-container" aria-hidden="true"></div>
 
-  <!-- MINIMALIST FLOATING LIVE WALLPAPER CONTROLS -->
+  <!-- FLOATING LIVE WALLPAPER CONTROLS (Bottom-Right) -->
   <aside class="wallpaper-controls" id="wallpaper-controls" aria-label="Wallpaper Controls">
-    <!-- Mane 6 Party Guest Summon Button -->
-    <button id="btn-party-guest" class="ctrl-btn" title="Summon Mane 6 Party Guest & Special Effect" aria-label="Party Guest">
-      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Mane 6 Stage Switcher Dock -->
+    <div class="pony-switcher-dock" id="pony-switcher-dock" role="toolbar" aria-label="Mane 6 Roster Switcher">
+      <button type="button" class="pony-dock-btn active" data-pony="pinkie" title="Switch to Pinkie Pie" aria-label="Pinkie Pie">
+        <img src="assets/cm-pinkie.png" alt="Pinkie Pie Cutie Mark">
+      </button>
+      <button type="button" class="pony-dock-btn" data-pony="twilight" title="Switch to Twilight Sparkle" aria-label="Twilight Sparkle">
+        <img src="assets/cm-twilight.png" alt="Twilight Sparkle Cutie Mark">
+      </button>
+      <button type="button" class="pony-dock-btn" data-pony="rainbow" title="Switch to Rainbow Dash" aria-label="Rainbow Dash">
+        <img src="assets/cm-rainbow.png" alt="Rainbow Dash Cutie Mark">
+      </button>
+      <button type="button" class="pony-dock-btn" data-pony="fluttershy" title="Switch to Fluttershy" aria-label="Fluttershy">
+        <img src="assets/cm-fluttershy.png" alt="Fluttershy Cutie Mark">
+      </button>
+      <button type="button" class="pony-dock-btn" data-pony="rarity" title="Switch to Rarity" aria-label="Rarity">
+        <img src="assets/cm-rarity.png" alt="Rarity Cutie Mark">
+      </button>
+      <button type="button" class="pony-dock-btn" data-pony="applejack" title="Switch to Applejack" aria-label="Applejack">
+        <img src="assets/cm-applejack.png" alt="Applejack Cutie Mark">
+      </button>
+    </div>
+
+    <!-- Mode Toggle (Party vs Chill Mode) -->
+    <button type="button" id="btn-mode-toggle" class="ctrl-btn" title="Toggle Mode: Party Mode / Chill Work Mode" aria-label="Toggle Party or Chill Mode">
+      <svg id="icon-mode-party" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="currentColor" opacity="0.3"/>
         <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+      </svg>
+      <svg id="icon-mode-chill" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;" aria-hidden="true">
+        <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
+        <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
+        <line x1="6" y1="1" x2="6" y2="4"></line>
+        <line x1="10" y1="1" x2="10" y2="4"></line>
+        <line x1="14" y1="1" x2="14" y2="4"></line>
+      </svg>
+    </button>
+    <span class="mode-badge" id="mode-badge">Chill</span>
+
+    <!-- Toggle Task Manager Button -->
+    <button type="button" id="btn-taskmgr-toggle" class="ctrl-btn" title="Toggle Ponyville Task Manager" aria-label="Toggle Task Manager">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+        <line x1="8" y1="21" x2="16" y2="21"/>
+        <line x1="12" y1="17" x2="12" y2="21"/>
+        <polyline points="6 10 9 7 13 13 18 8"/>
+      </svg>
+    </button>
+
+    <!-- Toggle Daily Widgets Button -->
+    <button type="button" id="btn-widgets-toggle" class="ctrl-btn" title="Toggle Clock & To-Do Widgets" aria-label="Toggle Productivity Widgets">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+        <line x1="16" y1="2" x2="16" y2="6"/>
+        <line x1="8" y1="2" x2="8" y2="6"/>
+        <line x1="3" y1="10" x2="21" y2="10"/>
+      </svg>
+    </button>
+
+    <!-- Toggle Winamp Visualizer Button -->
+    <button type="button" id="btn-visualizer-toggle" class="ctrl-btn" title="Toggle Winamp Visualizer" aria-label="Toggle Audio Visualizer">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <line x1="12" y1="20" x2="12" y2="10"/>
+        <line x1="18" y1="20" x2="18" y2="4"/>
+        <line x1="6" y1="20" x2="6" y2="16"/>
+      </svg>
+    </button>
+
+    <!-- Mane 6 Party Guest Summon Button -->
+    <button type="button" id="btn-party-guest" class="ctrl-btn" title="Summon Mane 6 Party Guest & Special Effect" aria-label="Party Guest">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
       </svg>
     </button>
 
     <!-- Mute/Unmute SFX Button -->
-    <button id="btn-sound-toggle" class="ctrl-btn" title="Toggle Sound FX (Mute/Unmute)" aria-label="Toggle Sound">
-      <svg id="icon-sound-on" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <button type="button" id="btn-sound-toggle" class="ctrl-btn" title="Toggle Sound FX (Mute/Unmute)" aria-label="Toggle Sound">
+      <svg id="icon-sound-on" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"/>
         <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
         <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
       </svg>
-      <svg id="icon-sound-off" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+      <svg id="icon-sound-off" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;" aria-hidden="true">
         <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"/>
         <line x1="23" y1="9" x2="17" y2="15"/>
         <line x1="17" y1="9" x2="23" y2="15"/>
       </svg>
     </button>
 
-    <!-- Manual Reset Button -->
-    <button id="btn-manual-reset" class="ctrl-btn" title="Reset Stickers and Windows" aria-label="Reset Wallpaper">
-      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Manual Reset (Party Cannon) Button -->
+    <button type="button" id="btn-manual-reset" class="ctrl-btn" title="Party Cannon Reset: Blast Stickers and Windows" aria-label="Party Cannon Reset">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <polyline points="1 4 1 10 7 10"/>
         <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
       </svg>

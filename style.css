@@ -1,19 +1,197 @@
 /* ==========================================================================
-   Pinkie Pie Y2K Live Wallpaper - Mane 6 Party Edition (v2.0)
+   Pinkie Pie Y2K Live Wallpaper - Mane 6 Party Edition (v3.0 Production)
    Compatible with Lively Wallpaper & Wallpaper Engine
    ========================================================================== */
 
 :root {
-  --pink-primary: #FF7EB3;
-  --pink-light: #FFD6E7;
-  --pink-mid: #FFB5D3;
-  --pink-deep: #FF94C0;
-  --pink-hot: #EF2B85;
+  /* Dynamic Background & Theme Variables */
+  --bg-color: #FFF0F6;
+  --theme-primary: #FF7EB3;
+  --theme-light: #FFD6E7;
+  --theme-mid: #FFB5D3;
+  --theme-deep: #FF94C0;
+  --theme-hot: #EF2B85;
+  --theme-accent: #FF4081;
+  --theme-glow: rgba(255, 126, 179, 0.6);
+  --theme-shadow: rgba(255, 148, 192, 0.38);
+
+  /* Argyle Ribbon Colors & Timing */
+  --ribbon-bg: #FFD6E7;
+  --ribbon-argyle-mid: #FFB5D3;
+  --ribbon-argyle-deep: #FF94C0;
+  --ribbon-border: #FFFFFF;
+  --ribbon-glow: rgba(255, 126, 179, 0.45);
+  --ribbon-scroll-duration: 22s;
+  --ribbon-pulse-scale: 1;
+
+  /* Starfall Canvas Tint */
+  --star-glow: rgba(255, 181, 211, 0.65);
+
+  /* Vector Face Rig Palettes */
+  --character-coat-color: #F6B2D1;
+  --character-eye-color: #4792B3;
+  --character-blush-1: #FF4F93;
+  --character-blush-2: #FF85B3;
+
+  /* Audio Visualizer & Bass Reactivity */
+  --bass-bounce: 0px;
+  --bass-scale: 1;
+  --bass-glow: 0px;
+
+  /* 3D Cursor Parallax Offsets */
+  --parallax-bg-x: 0px;
+  --parallax-bg-y: 0px;
+  --parallax-ribbon-x: 0px;
+  --parallax-ribbon-y: 0px;
+  --parallax-char-x: 0px;
+  --parallax-char-y: 0px;
+  --parallax-eye-x: 0px;
+  --parallax-eye-y: 0px;
+
+  /* Windows 95/98 Classic Design Tokens */
   --win-bg: #C0C0C0;
   --win-light: #FFFFFF;
   --win-shadow: #808080;
   --win-dark: #000000;
+  --win-blue: #000080;
+  --win-blue-light: #1084D0;
   --font-retro: "MS Sans Serif", "Tahoma", "Segoe UI", sans-serif;
+}
+
+/* ==========================================================================
+   Dynamic Mane 6 Themes (Driven by body[data-pony])
+   ========================================================================== */
+
+body[data-pony="pinkie"] {
+  --bg-color: #FFF0F6;
+  --theme-primary: #FF7EB3;
+  --theme-light: #FFD6E7;
+  --theme-mid: #FFB5D3;
+  --theme-deep: #FF94C0;
+  --theme-hot: #EF2B85;
+  --theme-accent: #FF4081;
+  --theme-glow: rgba(255, 126, 179, 0.6);
+  --theme-shadow: rgba(255, 148, 192, 0.38);
+  --ribbon-bg: #FFD6E7;
+  --ribbon-argyle-mid: #FFB5D3;
+  --ribbon-argyle-deep: #FF94C0;
+  --ribbon-border: #FFFFFF;
+  --ribbon-glow: rgba(255, 126, 179, 0.5);
+  --star-glow: rgba(255, 181, 211, 0.65);
+  --character-coat-color: #F6B2D1;
+  --character-eye-color: #4792B3;
+  --character-blush-1: #FF4F93;
+  --character-blush-2: #FF85B3;
+}
+
+body[data-pony="twilight"] {
+  --bg-color: #F8F0FF;
+  --theme-primary: #9C27B0;
+  --theme-light: #F3E5F5;
+  --theme-mid: #CE93D8;
+  --theme-deep: #BA68C8;
+  --theme-hot: #7B1FA2;
+  --theme-accent: #E040FB;
+  --theme-glow: rgba(156, 39, 176, 0.6);
+  --theme-shadow: rgba(186, 104, 200, 0.4);
+  --ribbon-bg: #E1BEE7;
+  --ribbon-argyle-mid: #CE93D8;
+  --ribbon-argyle-deep: #BA68C8;
+  --ribbon-border: #FFFFFF;
+  --ribbon-glow: rgba(156, 39, 176, 0.5);
+  --star-glow: rgba(206, 147, 216, 0.65);
+  --character-coat-color: #D19FE8;
+  --character-eye-color: #662D91;
+  --character-blush-1: #C2185B;
+  --character-blush-2: #E91E63;
+}
+
+body[data-pony="rainbow"] {
+  --bg-color: #EBF8FF;
+  --theme-primary: #00BCD4;
+  --theme-light: #E0F7FA;
+  --theme-mid: #80DEEA;
+  --theme-deep: #4DD0E1;
+  --theme-hot: #0097A7;
+  --theme-accent: #FF1744;
+  --theme-glow: rgba(0, 188, 212, 0.6);
+  --theme-shadow: rgba(77, 208, 225, 0.4);
+  --ribbon-bg: #B2EBF2;
+  --ribbon-argyle-mid: #80DEEA;
+  --ribbon-argyle-deep: #4DD0E1;
+  --ribbon-border: #FFFFFF;
+  --ribbon-glow: rgba(0, 188, 212, 0.5);
+  --star-glow: rgba(128, 222, 234, 0.65);
+  --character-coat-color: #A0D7F7;
+  --character-eye-color: #BF1868;
+  --character-blush-1: #FF5252;
+  --character-blush-2: #FF8A80;
+}
+
+body[data-pony="fluttershy"] {
+  --bg-color: #FEFDE8;
+  --theme-primary: #FBC02D;
+  --theme-light: #FFFDE7;
+  --theme-mid: #FFF59D;
+  --theme-deep: #FFE082;
+  --theme-hot: #F57F17;
+  --theme-accent: #EC407A;
+  --theme-glow: rgba(251, 192, 45, 0.6);
+  --theme-shadow: rgba(255, 224, 130, 0.4);
+  --ribbon-bg: #FFF9C4;
+  --ribbon-argyle-mid: #FFF59D;
+  --ribbon-argyle-deep: #FFE082;
+  --ribbon-border: #FFFFFF;
+  --ribbon-glow: rgba(251, 192, 45, 0.5);
+  --star-glow: rgba(255, 245, 157, 0.65);
+  --character-coat-color: #FDF6AF;
+  --character-eye-color: #39B54A;
+  --character-blush-1: #F48FB1;
+  --character-blush-2: #F8BBD0;
+}
+
+body[data-pony="rarity"] {
+  --bg-color: #F4F6FC;
+  --theme-primary: #5C6BC0;
+  --theme-light: #E8EAF6;
+  --theme-mid: #C5CAE9;
+  --theme-deep: #9FA8DA;
+  --theme-hot: #3949AB;
+  --theme-accent: #7E57C2;
+  --theme-glow: rgba(92, 107, 192, 0.6);
+  --theme-shadow: rgba(159, 168, 218, 0.4);
+  --ribbon-bg: #E8EAF6;
+  --ribbon-argyle-mid: #C5CAE9;
+  --ribbon-argyle-deep: #9FA8DA;
+  --ribbon-border: #FFFFFF;
+  --ribbon-glow: rgba(92, 107, 192, 0.5);
+  --star-glow: rgba(197, 202, 233, 0.65);
+  --character-coat-color: #F4F3F8;
+  --character-eye-color: #2E3192;
+  --character-blush-1: #9575CD;
+  --character-blush-2: #B39DDB;
+}
+
+body[data-pony="applejack"] {
+  --bg-color: #FFF8E7;
+  --theme-primary: #FB8C00;
+  --theme-light: #FFF3E0;
+  --theme-mid: #FFE0B2;
+  --theme-deep: #FFCC80;
+  --theme-hot: #E65100;
+  --theme-accent: #43A047;
+  --theme-glow: rgba(251, 140, 0, 0.6);
+  --theme-shadow: rgba(255, 204, 128, 0.4);
+  --ribbon-bg: #FFE0B2;
+  --ribbon-argyle-mid: #FFCC80;
+  --ribbon-argyle-deep: #FFA726;
+  --ribbon-border: #FFFFFF;
+  --ribbon-glow: rgba(251, 140, 0, 0.5);
+  --star-glow: rgba(255, 224, 178, 0.65);
+  --character-coat-color: #FDB953;
+  --character-eye-color: #4A993D;
+  --character-blush-1: #FF7043;
+  --character-blush-2: #FFAB91;
 }
 
 *, *::before, *::after {
@@ -31,9 +209,10 @@ html, body {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  background-color: #FFFFFF;
+  background-color: var(--bg-color, #FFFFFF);
   font-family: var(--font-retro);
   cursor: none; /* Custom pixel cursor takes over */
+  transition: background-color 0.45s ease;
 }
 
 /* ==========================================================================
@@ -50,7 +229,7 @@ html, body {
   z-index: 10000;
   transform: translate3d(-9999px, -9999px, 0);
   transition: transform 0.02s linear;
-  filter: drop-shadow(1px 2px 2px rgba(239, 43, 133, 0.35));
+  filter: drop-shadow(1px 2px 2px var(--theme-hot, #EF2B85));
 }
 
 .sparkle-container {
@@ -103,7 +282,7 @@ html, body {
   height: 80px;
   border-radius: 50%;
   border: 3.5px solid #FFFFFF;
-  box-shadow: 0 0 12px rgba(255, 126, 179, 0.8), inset 0 0 8px rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 12px var(--theme-glow, rgba(255, 126, 179, 0.8)), inset 0 0 8px rgba(255, 255, 255, 0.9);
   pointer-events: none;
   transform: translate(-50%, -50%) scale(0.1);
   animation: rippleExpand 0.5s ease-out forwards;
@@ -131,8 +310,11 @@ html, body {
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  background: #FFFFFF;
+  background: var(--bg-color, #FFFFFF);
   z-index: 1;
+  transform: translate3d(var(--parallax-bg-x), var(--parallax-bg-y), 0);
+  transition: transform 0.1s ease-out;
+  will-change: transform;
 }
 
 .starfield-canvas {
@@ -145,32 +327,31 @@ html, body {
   pointer-events: none;
 }
 
-/* Wavy Horizontal Pastel-Pink Argyle Ribbon Band */
+/* Wavy Horizontal Pastel Argyle Ribbon Band */
 .ribbon-band-wrapper {
   position: absolute;
   top: 45%;
   left: 0;
   width: 100%;
   height: 240px;
-  transform: translateY(-50%);
+  transform: translate3d(var(--parallax-ribbon-x), calc(-50% + var(--parallax-ribbon-y) + var(--bass-bounce)), 0);
   z-index: 3;
   overflow: hidden;
   pointer-events: none;
   animation: ribbonBeatPulse 2.4s ease-in-out infinite alternate;
+  filter: drop-shadow(0 calc(8px + var(--bass-glow)) calc(18px + var(--bass-glow)) var(--ribbon-glow));
+  will-change: transform, filter;
 }
 
 @keyframes ribbonBeatPulse {
   0% {
-    transform: translateY(-50%) scaleY(1);
-    filter: drop-shadow(0 8px 18px rgba(255, 181, 211, 0.45));
+    transform: translate3d(var(--parallax-ribbon-x), calc(-50% + var(--parallax-ribbon-y)), 0) scaleY(1);
   }
   50% {
-    transform: translateY(-50%) scaleY(1.035);
-    filter: drop-shadow(0 12px 24px rgba(255, 126, 179, 0.55));
+    transform: translate3d(var(--parallax-ribbon-x), calc(-50% + var(--parallax-ribbon-y)), 0) scaleY(1.035);
   }
   100% {
-    transform: translateY(-50%) scaleY(0.985);
-    filter: drop-shadow(0 6px 14px rgba(255, 181, 211, 0.4));
+    transform: translate3d(var(--parallax-ribbon-x), calc(-50% + var(--parallax-ribbon-y)), 0) scaleY(0.985);
   }
 }
 
@@ -178,7 +359,7 @@ html, body {
   display: flex;
   width: 300%;
   height: 100%;
-  animation: infiniteScrollRibbon 22s linear infinite;
+  animation: infiniteScrollRibbon var(--ribbon-scroll-duration, 22s) linear infinite;
   will-change: transform;
 }
 
@@ -195,17 +376,17 @@ html, body {
   width: 33.3333%;
   height: 100%;
   flex-shrink: 0;
-  background-color: var(--pink-light);
-  /* Genuine Argyle Diamond-Checkered Pattern in CSS Gradients */
+  background-color: var(--ribbon-bg);
+  /* Genuine Argyle Diamond-Checkered Pattern in Dynamic CSS Gradients */
   background-image: 
     repeating-linear-gradient(120deg, rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0.65) 2px, transparent 2px, transparent 40px),
     repeating-linear-gradient(60deg, rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0.65) 2px, transparent 2px, transparent 40px),
-    linear-gradient(30deg, var(--pink-mid) 12%, transparent 12.5%, transparent 87%, var(--pink-mid) 87.5%, var(--pink-mid)),
-    linear-gradient(150deg, var(--pink-mid) 12%, transparent 12.5%, transparent 87%, var(--pink-mid) 87.5%, var(--pink-mid)),
-    linear-gradient(30deg, var(--pink-mid) 12%, transparent 12.5%, transparent 87%, var(--pink-mid) 87.5%, var(--pink-mid)),
-    linear-gradient(150deg, var(--pink-mid) 12%, transparent 12.5%, transparent 87%, var(--pink-mid) 87.5%, var(--pink-mid)),
-    radial-gradient(var(--pink-deep) 22%, transparent 25%),
-    radial-gradient(var(--pink-deep) 22%, transparent 25%);
+    linear-gradient(30deg, var(--ribbon-argyle-mid) 12%, transparent 12.5%, transparent 87%, var(--ribbon-argyle-mid) 87.5%, var(--ribbon-argyle-mid)),
+    linear-gradient(150deg, var(--ribbon-argyle-mid) 12%, transparent 12.5%, transparent 87%, var(--ribbon-argyle-mid) 87.5%, var(--ribbon-argyle-mid)),
+    linear-gradient(30deg, var(--ribbon-argyle-mid) 12%, transparent 12.5%, transparent 87%, var(--ribbon-argyle-mid) 87.5%, var(--ribbon-argyle-mid)),
+    linear-gradient(150deg, var(--ribbon-argyle-mid) 12%, transparent 12.5%, transparent 87%, var(--ribbon-argyle-mid) 87.5%, var(--ribbon-argyle-mid)),
+    radial-gradient(var(--ribbon-argyle-deep) 22%, transparent 25%),
+    radial-gradient(var(--ribbon-argyle-deep) 22%, transparent 25%);
   background-position: 0 0, 0 0, 0 0, 0 0, 40px 68px, 40px 68px, 0 0, 40px 68px;
   background-size: 80px 136px;
   /* Smooth Sinusoidal Wavy Ribbon Clip */
@@ -245,12 +426,13 @@ html, body {
     6.25% 62%, 
     0% 70%
   );
-  border-top: 4px solid #FFFFFF;
-  border-bottom: 4px solid #FFFFFF;
+  border-top: 4px solid var(--ribbon-border);
+  border-bottom: 4px solid var(--ribbon-border);
+  transition: background-color 0.45s ease;
 }
 
 /* ==========================================================================
-   Layer 2: Center Character (Pinkie Pie)
+   Layer 2: Center Stage Character
    ========================================================================== */
 
 .main-stage {
@@ -267,29 +449,30 @@ html, body {
 }
 
 .pinkie-wrapper {
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    height: clamp(480px, 62vh, 760px);
-    width: clamp(380px, 50vw, 680px);
-    margin-bottom: 0;
-    pointer-events: auto;
-    transform-origin: bottom center;
-    /* Đặt chuyển động nhún nhẹ ở lớp bọc ngoài để chạy liên tục không bao giờ bị ngắt */
-    animation: pinkieIdleMotion 2.2s ease-in-out infinite;
-    will-change: transform;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  height: clamp(480px, 62vh, 760px);
+  width: clamp(380px, 50vw, 680px);
+  margin-bottom: 0;
+  pointer-events: auto;
+  transform-origin: bottom center;
+  animation: ponyIdleMotion 2.2s ease-in-out infinite;
+  will-change: transform;
 }
 
 .pinkie-character {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    transform-origin: bottom center;
-    will-change: transform;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-origin: bottom center;
+  transform: translate3d(var(--parallax-char-x), calc(var(--parallax-char-y) + var(--bass-bounce)), 0) scale(var(--bass-scale));
+  transition: transform 0.08s ease-out;
+  will-change: transform;
 }
 
-@keyframes pinkieIdleMotion {
+@keyframes ponyIdleMotion {
   0% {
     transform: translateY(0px) rotate(0deg) scale(1, 1);
   }
@@ -300,23 +483,23 @@ html, body {
     transform: translateY(-16px) rotate(0.6deg) scale(1.01, 1.025);
   }
   75% {
-    transform: translateY(-6px) rotate(1.5deg) scale(0.995, 1.008);
+    transform: translateY(-6px) rotate(-0.5deg) scale(0.995, 1.005);
   }
   100% {
     transform: translateY(0px) rotate(0deg) scale(1, 1);
   }
 }
 
-/* Click Squish-and-Bounce Reaction Animation */
+/* Interactive Click Bouncy Squish */
 .pinkie-character.pinkie-squish {
-  animation: pinkieSquishSpring 0.48s cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important;
+  animation: ponySquishReact 0.46s cubic-bezier(0.18, 0.89, 0.32, 1.28) !important;
 }
 
-@keyframes pinkieSquishSpring {
+@keyframes ponySquishReact {
   0% {
     transform: translateY(0) scale(1, 1);
   }
-  25% {
+  28% {
     transform: translateY(18px) scale(1.18, 0.80);
   }
   60% {
@@ -330,6 +513,7 @@ html, body {
   }
 }
 
+/* SINGLE clean definition for visual box */
 .pinkie-visual-box {
   position: relative;
   width: 100%;
@@ -339,33 +523,76 @@ html, body {
   align-items: flex-end;
 }
 
+.pinkie-rig-frame {
+  position: relative;
+  height: 100%;
+  width: fit-content;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+
 .pinkie-img {
+  position: relative;
+  display: block;
   width: auto;
   height: 100%;
   max-width: 100%;
   object-fit: contain;
   pointer-events: none;
-  filter: drop-shadow(0 14px 26px rgba(255, 148, 192, 0.38));
-  transition: opacity 0.1s ease;
+  filter: drop-shadow(0 14px 26px var(--theme-shadow));
+  transition: filter 0.35s ease;
+}
+
+/* Vector Facial Expression Rig & Gaze Tracking */
+.pinkie-face-rig {
   position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 5;
+  transform: translate3d(var(--parallax-eye-x), var(--parallax-eye-y), 0);
+  transition: transform 0.06s ease-out;
+  will-change: transform;
 }
 
-.pinkie-idle-state {
-  opacity: 1;
+.coat-patch {
+  fill: var(--character-coat-color, #F6B2D1);
+  transition: fill 0.35s ease;
 }
 
-.pinkie-blink-state {
-  display: none !important;
+.expr-blush,
+.expr-eye-left,
+.expr-eye-right,
+.expr-star-eyes {
   opacity: 0;
+  transition: opacity 0.08s ease;
 }
 
-/* Giữ nguyên khuôn mặt tròn trịa của pinkie-idle.png khi click */
-.pinkie-character.is-blinking .pinkie-idle-state {
+/* 1. Natural Idle Blink */
+.pinkie-character.expr-blink .expr-eye-left,
+.pinkie-character.expr-blink .expr-eye-right {
   opacity: 1;
-  filter: drop-shadow(0 14px 28px rgba(255, 126, 179, 0.65)) brightness(1.04);
+}
+
+/* 2. Happy Smile + Cheeks Blush (^ ^) */
+.pinkie-character.expr-happy .expr-eye-left,
+.pinkie-character.expr-happy .expr-eye-right,
+.pinkie-character.expr-happy .expr-blush {
+  opacity: 1;
+}
+
+/* 3. Mischievous Wink (^ O) */
+.pinkie-character.expr-wink .expr-eye-left,
+.pinkie-character.expr-wink .expr-blush {
+  opacity: 1;
+}
+
+/* 4. Radiant Starry Eyes (✦ ✦) */
+.pinkie-character.expr-starry .expr-star-eyes,
+.pinkie-character.expr-starry .expr-blush {
+  opacity: 1;
 }
 
 /* SVG Fallback Node */
@@ -375,7 +602,7 @@ html, body {
   display: flex;
   justify-content: center;
   align-items: flex-end;
-  filter: drop-shadow(0 14px 22px rgba(255, 148, 192, 0.35));
+  filter: drop-shadow(0 14px 22px var(--theme-shadow));
 }
 
 .pinkie-svg-fallback svg {
@@ -432,6 +659,16 @@ html, body {
   display: block;
 }
 
+/* Party Cannon Blasting Physics Projectile */
+.slapped-sticker.cannon-projectile {
+  position: fixed !important;
+  z-index: 9995 !important;
+  pointer-events: none !important;
+  animation: none !important;
+  transition: none !important;
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.35)) brightness(1.15) !important;
+}
+
 /* ==========================================================================
    Layer 4: Retro Windows 95/98 Pop-up Windows (Draggable & Themed)
    ========================================================================== */
@@ -451,7 +688,6 @@ html, body {
   width: clamp(280px, 24vw, 380px);
   height: clamp(240px, 26vh, 320px);
   background: var(--win-bg);
-  /* Classic Win95 3D Raised Bevel Border */
   border-top: 2px solid var(--win-light);
   border-left: 2px solid var(--win-light);
   border-right: 2px solid var(--win-dark);
@@ -542,6 +778,12 @@ html, body {
   text-shadow: 1px 1px 0px rgba(136, 14, 79, 0.7);
 }
 
+.titlebar-taskmgr {
+  background: linear-gradient(90deg, #000080, #1084D0);
+  color: #FFFFFF;
+  text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.8);
+}
+
 .retro-title-text {
   display: flex;
   align-items: center;
@@ -556,7 +798,14 @@ html, body {
   font-size: 12px;
 }
 
-/* Close Button [X] */
+/* Titlebar Action Buttons (Min, Max, Close) */
+.retro-title-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.retro-min-btn,
 .retro-close-btn {
   width: 18px;
   height: 16px;
@@ -579,11 +828,13 @@ html, body {
   outline: none;
 }
 
-.retro-close-btn:hover {
+.retro-close-btn:hover,
+.retro-min-btn:hover {
   background: #E0E0E0;
 }
 
-.retro-close-btn:active {
+.retro-close-btn:active,
+.retro-min-btn:active {
   border-top: 1.5px solid var(--win-dark);
   border-left: 1.5px solid var(--win-dark);
   border-right: 1.5px solid var(--win-light);
@@ -608,7 +859,6 @@ html, body {
   justify-content: center;
 }
 
-/* Zoomed-in Close-up of Pinkie Pie's upper face & blue eyes */
 .popup-pinkie-closeup {
   position: absolute;
   width: 260%;
@@ -620,7 +870,6 @@ html, body {
   filter: contrast(1.05) saturate(1.1);
 }
 
-/* Mane 6 Cameo Guest Pony Viewport */
 .popup-guest-pony {
   position: absolute;
   width: 130%;
@@ -717,7 +966,6 @@ html, body {
   padding: 5px 21px 3px 23px;
 }
 
-/* Floating Retro Hearts inside the Pop-up Viewport */
 .popup-floating-heart {
   position: absolute;
   width: 28px;
@@ -736,7 +984,6 @@ html, body {
   }
 }
 
-/* Retro Scanline Overlay for Nostalgic CRT Vibe */
 .retro-scanlines {
   position: absolute;
   top: 0;
@@ -754,7 +1001,6 @@ html, body {
   z-index: 20;
 }
 
-/* Mini Sticker Clones replicated in the Window Viewport */
 .popup-sticker-layer {
   position: absolute;
   width: 100%;
@@ -781,7 +1027,231 @@ html, body {
 }
 
 /* ==========================================================================
-   Mane 6 Fullscreen Signature Effects Layer
+   Milestone 2: Real-Time Audio Visualizer (Winamp Y2K Style)
+   ========================================================================== */
+
+.winamp-visualizer {
+  position: fixed;
+  bottom: 68px;
+  left: 20px;
+  width: 230px;
+  background: var(--win-bg);
+  border-top: 2px solid var(--win-light);
+  border-left: 2px solid var(--win-light);
+  border-right: 2px solid var(--win-dark);
+  border-bottom: 2px solid var(--win-dark);
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.35);
+  padding: 3px;
+  z-index: 890;
+  font-family: var(--font-retro);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  user-select: none;
+}
+
+.winamp-visualizer.is-minimized .winamp-body {
+  display: none;
+}
+
+.winamp-titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 20px;
+  padding: 0 4px;
+  background: linear-gradient(90deg, #1084D0, #000080);
+  color: #FFFFFF;
+  font-size: 10.5px;
+  font-weight: bold;
+}
+
+.winamp-body {
+  background: #111116;
+  border-top: 2px solid var(--win-dark);
+  border-left: 2px solid var(--win-dark);
+  border-right: 2px solid var(--win-light);
+  border-bottom: 2px solid var(--win-light);
+  padding: 6px;
+  margin-top: 2px;
+}
+
+.winamp-screen {
+  position: relative;
+  width: 100%;
+  height: 52px;
+  background: #08080C;
+  border: 1px solid #2B2B38;
+}
+
+.winamp-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.winamp-metrics {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+  font-size: 9.5px;
+  color: #00FF66;
+  font-family: "Consolas", monospace;
+  text-shadow: 0 0 4px rgba(0, 255, 102, 0.6);
+}
+
+.winamp-controls {
+  display: flex;
+  gap: 4px;
+  margin-top: 5px;
+}
+
+.winamp-btn {
+  flex: 1;
+  background: var(--win-bg);
+  border-top: 1.5px solid var(--win-light);
+  border-left: 1.5px solid var(--win-light);
+  border-right: 1.5px solid var(--win-dark);
+  border-bottom: 1.5px solid var(--win-dark);
+  font-size: 10px;
+  font-weight: bold;
+  padding: 2px 4px;
+  cursor: pointer;
+}
+
+.winamp-btn:active {
+  border-top: 1.5px solid var(--win-dark);
+  border-left: 1.5px solid var(--win-dark);
+  border-right: 1.5px solid var(--win-light);
+  border-bottom: 1.5px solid var(--win-light);
+  padding: 3px 3px 1px 5px;
+}
+
+/* ==========================================================================
+   Milestone 2: Live Hardware Monitor (Ponyville_TaskMgr.exe)
+   ========================================================================== */
+
+.taskmgr-window {
+  position: absolute;
+  width: clamp(310px, 26vw, 420px);
+  min-height: 290px;
+  background: var(--win-bg);
+  border-top: 2px solid var(--win-light);
+  border-left: 2px solid var(--win-light);
+  border-right: 2px solid var(--win-dark);
+  border-bottom: 2px solid var(--win-dark);
+  box-shadow: 4px 6px 20px rgba(0, 0, 0, 0.4);
+  padding: 3px;
+  z-index: 895;
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+  touch-action: none;
+}
+
+.taskmgr-tabs {
+  display: flex;
+  gap: 3px;
+  margin-top: 3px;
+  border-bottom: 1px solid var(--win-shadow);
+  padding-left: 4px;
+}
+
+.taskmgr-tab {
+  font-family: var(--font-retro);
+  font-size: 11px;
+  padding: 3px 10px;
+  background: var(--win-bg);
+  border-top: 1.5px solid var(--win-light);
+  border-left: 1.5px solid var(--win-light);
+  border-right: 1.5px solid var(--win-dark);
+  border-bottom: none;
+  cursor: pointer;
+}
+
+.taskmgr-tab.active {
+  background: #ECE9D8;
+  font-weight: bold;
+  padding-bottom: 4px;
+  margin-bottom: -1px;
+}
+
+.taskmgr-content {
+  flex: 1;
+  background: #FFFFFF;
+  border-top: 2px solid var(--win-shadow);
+  border-left: 2px solid var(--win-shadow);
+  border-right: 2px solid var(--win-light);
+  border-bottom: 2px solid var(--win-light);
+  padding: 8px;
+  margin-top: 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.taskmgr-section-title {
+  font-size: 11px;
+  font-weight: bold;
+  color: #000000;
+  display: flex;
+  justify-content: space-between;
+}
+
+.taskmgr-graph-box {
+  width: 100%;
+  height: 75px;
+  background: #000000;
+  border: 1px solid #1084D0;
+  position: relative;
+  overflow: hidden;
+}
+
+.taskmgr-graph-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.taskmgr-meters {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.taskmgr-meter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 10.5px;
+}
+
+.taskmgr-progress-track {
+  height: 14px;
+  background: #000000;
+  border: 1px solid var(--win-shadow);
+  position: relative;
+  overflow: hidden;
+}
+
+.taskmgr-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00C853, #76FF03);
+  width: 25%;
+  transition: width 0.3s ease;
+}
+
+.taskmgr-statusbar {
+  margin-top: 4px;
+  border-top: 1px solid var(--win-shadow);
+  padding-top: 2px;
+  font-size: 10px;
+  color: #333333;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* ==========================================================================
+   Milestone 3: Mane 6 Fullscreen Signature Screen Effects
    ========================================================================== */
 
 .signature-effects-container {
@@ -991,7 +1461,398 @@ html, body {
 }
 
 /* ==========================================================================
-   Big Reset Celebration Sparkle Burst
+   Milestone 3: Elements of Harmony Full-Screen 6-Color Rainbow Combo
+   ========================================================================== */
+
+.harmony-combo-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 950;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.harmony-combo-container.active {
+  opacity: 1;
+}
+
+.harmony-rainbow-rays {
+  position: absolute;
+  inset: -50%;
+  background: conic-gradient(
+    from 0deg at 50% 50%,
+    rgba(255, 126, 179, 0.65) 0deg,
+    rgba(156, 39, 176, 0.65) 60deg,
+    rgba(0, 210, 255, 0.65) 120deg,
+    rgba(255, 235, 59, 0.65) 180deg,
+    rgba(121, 134, 203, 0.65) 240deg,
+    rgba(255, 152, 0, 0.65) 300deg,
+    rgba(255, 126, 179, 0.65) 360deg
+  );
+  animation: harmonyRaySpin 12s linear infinite;
+  filter: blur(12px) brightness(1.2);
+  mix-blend-mode: screen;
+}
+
+@keyframes harmonyRaySpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.harmony-seal-ring {
+  position: relative;
+  width: min(85vw, 520px);
+  height: min(85vw, 520px);
+  border-radius: 50%;
+  border: 4px dashed #FFF9A6;
+  box-shadow: 0 0 35px #FFD700, inset 0 0 35px #FFD700;
+  animation: harmonySealPulse 1.8s ease-in-out infinite alternate;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes harmonySealPulse {
+  0% { transform: scale(0.92) rotate(0deg); }
+  100% { transform: scale(1.08) rotate(15deg); }
+}
+
+.harmony-banner {
+  position: absolute;
+  bottom: 12%;
+  padding: 10px 24px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 3px solid #FFD700;
+  border-radius: 30px;
+  box-shadow: 0 0 25px rgba(255, 215, 0, 0.8), 0 8px 24px rgba(0, 0, 0, 0.3);
+  font-family: var(--font-retro);
+  font-size: clamp(14px, 2.4vw, 22px);
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  color: #D81B60;
+  text-transform: uppercase;
+  animation: harmonyBannerFloat 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes harmonyBannerFloat {
+  0% { transform: translateY(0) scale(0.98); }
+  100% { transform: translateY(-8px) scale(1.02); }
+}
+
+/* ==========================================================================
+   Milestone 4: Daily Y2K Productivity Widgets (Container Queries)
+   ========================================================================== */
+
+.y2k-widget {
+  position: absolute;
+  container-type: inline-size;
+  resize: both;
+  overflow: hidden;
+  background: var(--win-bg);
+  border-top: 2px solid var(--win-light);
+  border-left: 2px solid var(--win-light);
+  border-right: 2px solid var(--win-dark);
+  border-bottom: 2px solid var(--win-dark);
+  box-shadow: 3px 5px 18px rgba(0, 0, 0, 0.35);
+  padding: 3px;
+  z-index: 880;
+  user-select: none;
+  min-width: 220px;
+  min-height: 190px;
+}
+
+.y2k-widget-titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 22px;
+  padding: 0 4px;
+  background: linear-gradient(90deg, #FF7EB3, #FFA8CE);
+  color: #FFFFFF;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: grab;
+}
+
+.y2k-widget.is-dragging .y2k-widget-titlebar {
+  cursor: grabbing !important;
+}
+
+.y2k-widget-body {
+  height: calc(100% - 26px);
+  background: #FFFFFF;
+  border-top: 2px solid var(--win-shadow);
+  border-left: 2px solid var(--win-shadow);
+  border-right: 2px solid var(--win-light);
+  border-bottom: 2px solid var(--win-light);
+  padding: 8px;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+/* Container Queries for Clock / Calendar Widget */
+#widget-clock {
+  width: 270px;
+  height: 250px;
+}
+
+.clock-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6px;
+  background: #FFF0F6;
+  border: 1px solid var(--theme-mid);
+  margin-bottom: 8px;
+  border-radius: 4px;
+}
+
+.clock-digital {
+  font-family: "Consolas", monospace;
+  font-size: 26px;
+  font-weight: 900;
+  color: #D81B60;
+  letter-spacing: 1px;
+}
+
+.clock-date {
+  font-size: 11px;
+  color: #555555;
+  margin-top: 2px;
+}
+
+.mini-calendar-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 10.5px;
+  text-align: center;
+}
+
+.mini-calendar-table th {
+  color: #888888;
+  padding: 2px;
+  font-weight: bold;
+}
+
+.mini-calendar-table td {
+  padding: 3px 2px;
+}
+
+.mini-calendar-table td.today {
+  background: #FF7EB3;
+  color: #FFFFFF;
+  font-weight: bold;
+  border-radius: 50%;
+}
+
+.pony-quote-box {
+  margin-top: 8px;
+  padding: 4px 6px;
+  background: #FFF9C4;
+  border-left: 3px solid #FBC02D;
+  font-size: 10px;
+  color: #4A3525;
+  font-style: italic;
+}
+
+@container (max-width: 240px) {
+  .clock-digital {
+    font-size: 20px;
+  }
+  .mini-calendar-table {
+    font-size: 9px;
+  }
+  .pony-quote-box {
+    display: none;
+  }
+}
+
+/* Container Queries for To-Do List Widget */
+#widget-todo {
+  width: 290px;
+  height: 270px;
+}
+
+.todo-input-bar {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.todo-text-input {
+  flex: 1;
+  height: 24px;
+  padding: 0 6px;
+  font-family: var(--font-retro);
+  font-size: 11px;
+  border-top: 2px solid var(--win-shadow);
+  border-left: 2px solid var(--win-shadow);
+  border-right: 2px solid var(--win-light);
+  border-bottom: 2px solid var(--win-light);
+  outline: none;
+}
+
+.todo-add-btn {
+  height: 24px;
+  padding: 0 10px;
+  background: var(--win-bg);
+  border-top: 1.5px solid var(--win-light);
+  border-left: 1.5px solid var(--win-light);
+  border-right: 1.5px solid var(--win-dark);
+  border-bottom: 1.5px solid var(--win-dark);
+  font-family: var(--font-retro);
+  font-size: 11px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.todo-add-btn:active {
+  border-top: 1.5px solid var(--win-dark);
+  border-left: 1.5px solid var(--win-dark);
+  border-right: 1.5px solid var(--win-light);
+  border-bottom: 1.5px solid var(--win-light);
+  padding: 1px 9px 0 11px;
+}
+
+.todo-items-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.todo-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 3px 6px;
+  background: #F8F9FA;
+  border: 1px solid #E0E0E0;
+  font-size: 11px;
+}
+
+.todo-item.completed span {
+  text-decoration: line-through;
+  color: #999999;
+}
+
+.todo-item label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.todo-del-btn {
+  background: transparent;
+  border: none;
+  color: #CC0000;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0 4px;
+  font-size: 11px;
+}
+
+.todo-summary {
+  margin-top: 6px;
+  font-size: 10px;
+  color: #666666;
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid #ECECEC;
+  padding-top: 4px;
+}
+
+@container (max-width: 240px) {
+  .todo-add-btn {
+    padding: 0 6px;
+  }
+}
+
+/* ==========================================================================
+   Milestone 4: Chill Mode Status Indicator
+   ========================================================================== */
+
+body.chill-mode {
+  --ribbon-pulse-scale: 0.98;
+}
+
+body.chill-mode .wallpaper-controls {
+  border-color: rgba(144, 202, 249, 0.8);
+}
+
+.mode-badge {
+  font-size: 9.5px;
+  font-weight: bold;
+  padding: 2px 7px;
+  border-radius: 12px;
+  background: #E0F2FE;
+  color: #0284C7;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  display: none;
+}
+
+body.chill-mode .mode-badge {
+  display: inline-block;
+}
+
+/* ==========================================================================
+   Milestone 3: Mane 6 Character Switcher Quick-Dock
+   ========================================================================== */
+
+.pony-switcher-dock {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding-right: 6px;
+  border-right: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.pony-dock-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1.5px solid transparent;
+  background: rgba(255, 255, 255, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 2px;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  outline: none;
+}
+
+.pony-dock-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.pony-dock-btn:hover {
+  transform: scale(1.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.pony-dock-btn.active {
+  border-color: var(--theme-hot);
+  box-shadow: 0 0 8px var(--theme-hot);
+  transform: scale(1.18);
+}
+
+/* ==========================================================================
+   Reset Celebration Particle Burst
    ========================================================================== */
 
 .reset-burst-container {
@@ -1036,16 +1897,16 @@ html, body {
   right: 22px;
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 10px;
-  background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  gap: 6px;
+  padding: 5px 10px;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 181, 211, 0.7);
   border-radius: 28px;
-  box-shadow: 0 4px 16px rgba(255, 126, 179, 0.25);
+  box-shadow: 0 4px 18px rgba(255, 126, 179, 0.25);
   z-index: 900;
-  opacity: 0.15;
+  opacity: 0.28;
   transition: opacity 0.35s ease, transform 0.2s ease, box-shadow 0.35s ease;
   pointer-events: auto;
 }
@@ -1054,19 +1915,19 @@ html, body {
 .wallpaper-controls:focus-within {
   opacity: 1;
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(255, 126, 179, 0.45);
+  box-shadow: 0 6px 22px rgba(255, 126, 179, 0.45);
 }
 
 .ctrl-btn {
   background: transparent;
   border: none;
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #EF2B85;
+  color: var(--theme-hot, #EF2B85);
   cursor: pointer;
   transition: background 0.2s ease, transform 0.15s ease, color 0.2s ease;
   outline: none;
@@ -1074,12 +1935,17 @@ html, body {
 
 .ctrl-btn:hover {
   background: rgba(255, 126, 179, 0.2);
-  color: #C70068;
+  color: var(--theme-primary, #FF7EB3);
   transform: scale(1.12);
 }
 
 .ctrl-btn:active {
   transform: scale(0.92);
+}
+
+.ctrl-btn.active {
+  background: var(--theme-hot, #EF2B85);
+  color: #FFFFFF;
 }
 
 /* Responsive Scaling for Small Displays */
