@@ -1,8 +1,9 @@
 /**
- * Pinkie Pie & Mane 6 Y2K Party Live Wallpaper (v3.0 Production Edition)
+ * Pinkie Pie & Mane 6 Y2K Party Live Wallpaper (v4.0 Production Edition)
  * Native Lively Wallpaper & Wallpaper Engine compatible.
  * Procedural Web Audio API, Hardware Monitor, Audio Visualizer,
- * Vector Face Rig, Parallax Gaze Tracking & Daily Y2K Widgets.
+ * Multi-Pose Sprite Library, Locked 1:1 Vector Face Rig, Visual Eye Rig Tuner (Ctrl+E),
+ * Smart Sticker Placement, Petting Gestures, Speech Bubbles & Themed Particles.
  */
 
 (function () {
@@ -82,6 +83,27 @@
 
       osc.start(now);
       osc.stop(now + 0.1);
+    }
+
+    /** Soft melodic chime for head-patting */
+    playPettingChime() {
+      if (this.isMuted || !this.ctx) return;
+      if (this.ctx.state === 'suspended') this.ctx.resume();
+
+      const now = this.ctx.currentTime;
+      const freqs = [659.25, 880.00, 1046.50];
+      freqs.forEach((f, idx) => {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(f, now + idx * 0.04);
+        gain.gain.setValueAtTime(0.18, now + idx * 0.04);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.04 + 0.16);
+        osc.connect(gain);
+        gain.connect(this.masterGain);
+        osc.start(now + idx * 0.04);
+        osc.stop(now + idx * 0.04 + 0.18);
+      });
     }
 
     /** Nostalgic two-tone pastel chime (587Hz D5 -> 880Hz A5) */
@@ -178,7 +200,6 @@
       if (this.ctx.state === 'suspended') this.ctx.resume();
 
       const now = this.ctx.currentTime;
-      // Low bass impact
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
       osc.type = 'triangle';
@@ -191,7 +212,6 @@
       osc.start(now);
       osc.stop(now + 0.3);
 
-      // Party whistle sweep
       const whistle = this.ctx.createOscillator();
       const wGain = this.ctx.createGain();
       whistle.type = 'sine';
@@ -201,7 +221,7 @@
       wGain.gain.linearRampToValueAtTime(0.3, now + 0.12);
       wGain.gain.exponentialRampToValueAtTime(0.001, now + 0.32);
       whistle.connect(wGain);
-      wGain.connect(this.masterGain);
+      whistle.connect(this.masterGain);
       whistle.start(now + 0.05);
       whistle.stop(now + 0.35);
     }
@@ -212,7 +232,6 @@
       if (this.ctx.state === 'suspended') this.ctx.resume();
 
       const now = this.ctx.currentTime;
-      // Majestic chord: C5 (523.25), E5 (659.25), G5 (783.99), B5 (987.77), D6 (1174.66)
       const freqs = [523.25, 659.25, 783.99, 987.77, 1174.66, 1567.98];
       freqs.forEach((f, i) => {
         const osc = this.ctx.createOscillator();
@@ -229,7 +248,6 @@
       });
     }
 
-    /** Pony Switcher Chime */
     playPonySwitchChime(ponyId) {
       if (this.isMuted || !this.ctx) return;
       if (this.ctx.state === 'suspended') this.ctx.resume();
@@ -350,103 +368,383 @@
   const soundFX = new SoundFXController();
 
   /* ==========================================================================
-     2. Milestone 1: Static Character Palettes & Configurations
+     2. Tasks 1 & 2: Mane 6 Character Data Model with Multi-Pose Library
      ========================================================================== */
 
   const MANE_6_CHARACTERS = {
     pinkie: {
       id: 'pinkie',
       name: 'Pinkie Pie',
-      coatColor: '#F6B2D1',
-      eyeColor: '#4792B3',
-      blushColor: '#FF4F93',
-      file: 'assets/pinkie-idle.png',
-      cmFile: 'assets/cm-pinkie.png',
-      rig: {
-        leftEye: { cx: 29.5, cy: 48.5, rx: 9.5, ry: 10.2 },
-        rightEye: { cx: 64.5, cy: 48.5, rx: 9.5, ry: 10.2 },
-        blushLeft: { cx: 22.5, cy: 57.5, rx: 6.8, ry: 3.8 },
-        blushRight: { cx: 69.5, cy: 57.5, rx: 6.8, ry: 3.8 }
-      }
+      particleType: 'balloons',
+      quotes: [
+        'Did someone say PARTY?! 🎉',
+        'Life is a party, dress like it! 🧁',
+        'Laughter makes everything 100% better! 🎈',
+        'You can never have too many cupcakes!'
+      ],
+      poses: [
+        {
+          id: 'pose1',
+          label: 'Peek-a-boo',
+          file: 'assets/poses/pinkie-pose1.png',
+          scale: 1.0,
+          offsetY: 0,
+          coatColor: '#FAB7D0',
+          eyeColor: '#4792B3',
+          blushColor: '#FF4F93',
+          eyeRig: {
+            leftEye: { cx: 37.5, cy: 60.5, rx: 10.5, ry: 12.5, rot: -4, hidden: false },
+            rightEye: { cx: 72.5, cy: 59.0, rx: 11.0, ry: 13.0, rot: 4, hidden: false },
+            blushLeft: { cx: 29.0, cy: 71.0, rx: 6.5, ry: 3.5 },
+            blushRight: { cx: 79.0, cy: 70.0, rx: 6.5, ry: 3.5 }
+          }
+        },
+        {
+          id: 'pose2',
+          label: 'Milkshake Sip',
+          file: 'assets/poses/pinkie-pose2.png',
+          scale: 1.0,
+          offsetY: 0,
+          coatColor: '#ECBDD8',
+          eyeColor: '#4792B3',
+          blushColor: '#FF4F93',
+          eyeRig: {
+            leftEye: { cx: 41.5, cy: 48.0, rx: 6.2, ry: 8.5, rot: 0, hidden: false },
+            rightEye: { cx: 41.5, cy: 48.0, rx: 6.2, ry: 8.5, rot: 0, hidden: true },
+            blushLeft: { cx: 47.0, cy: 56.0, rx: 5.0, ry: 3.0 },
+            blushRight: { cx: 47.0, cy: 56.0, rx: 0.0, ry: 0.0 }
+          }
+        },
+        {
+          id: 'pose3',
+          label: 'Party Glasses',
+          file: 'assets/poses/pinkie-pose3.png',
+          scale: 1.0,
+          offsetY: 0,
+          coatColor: '#F8B9CF',
+          eyeColor: '#4792B3',
+          blushColor: '#FF4F93',
+          eyeRig: {
+            leftEye: { cx: 36.5, cy: 39.5, rx: 7.5, ry: 8.5, rot: -8, hidden: false },
+            rightEye: { cx: 57.5, cy: 42.5, rx: 8.0, ry: 8.8, rot: 8, hidden: false },
+            blushLeft: { cx: 30.0, cy: 48.0, rx: 5.5, ry: 3.2 },
+            blushRight: { cx: 64.0, cy: 52.0, rx: 5.5, ry: 3.2 }
+          }
+        }
+      ]
     },
     twilight: {
       id: 'twilight',
       name: 'Twilight Sparkle',
-      coatColor: '#D19FE8',
-      eyeColor: '#662D91',
-      blushColor: '#C2185B',
-      file: 'assets/twilight.png',
-      cmFile: 'assets/cm-twilight.png',
-      rig: {
-        leftEye: { cx: 34.0, cy: 45.0, rx: 9.0, ry: 9.8 },
-        rightEye: { cx: 66.0, cy: 45.0, rx: 9.0, ry: 9.8 },
-        blushLeft: { cx: 27.0, cy: 54.0, rx: 6.0, ry: 3.5 },
-        blushRight: { cx: 72.0, cy: 54.0, rx: 6.0, ry: 3.5 }
-      }
+      particleType: 'magic',
+      quotes: [
+        'According to chapter 4, friendship is magic! 🔮',
+        'A tidy desktop leads to a happy mind! 📚',
+        'Magic happens when we work together! ✨',
+        'Study break? Time to read another book!'
+      ],
+      poses: [
+        {
+          id: 'pose1',
+          label: 'Standing',
+          file: 'assets/poses/twilight-pose1.png',
+          scale: 1.0,
+          offsetY: 0,
+          coatColor: '#CAAAD1',
+          eyeColor: '#662D91',
+          blushColor: '#C2185B',
+          eyeRig: {
+            leftEye: { cx: 34.0, cy: 48.0, rx: 11.0, ry: 13.0, rot: -5, hidden: false },
+            rightEye: { cx: 64.0, cy: 44.0, rx: 11.5, ry: 13.5, rot: 5, hidden: false },
+            blushLeft: { cx: 27.0, cy: 61.0, rx: 6.0, ry: 3.5 },
+            blushRight: { cx: 72.0, cy: 56.0, rx: 6.0, ry: 3.5 }
+          }
+        },
+        {
+          id: 'pose2',
+          label: 'Adorkable Sit',
+          file: 'assets/poses/twilight-pose2.png',
+          scale: 1.0,
+          offsetY: 0,
+          coatColor: '#D19FE3',
+          eyeColor: '#662D91',
+          blushColor: '#C2185B',
+          eyeRig: {
+            leftEye: { cx: 34.0, cy: 30.5, rx: 4.5, ry: 5.8, rot: 0, hidden: false },
+            rightEye: { cx: 45.0, cy: 31.0, rx: 4.5, ry: 5.8, rot: 0, hidden: false },
+            blushLeft: { cx: 29.0, cy: 37.5, rx: 3.8, ry: 2.2 },
+            blushRight: { cx: 49.0, cy: 37.5, rx: 3.8, ry: 2.2 }
+          }
+        },
+        {
+          id: 'pose3',
+          label: 'Joyful Grin',
+          file: 'assets/poses/twilight-pose3.png',
+          scale: 1.0,
+          offsetY: 0,
+          coatColor: '#C391B7',
+          eyeColor: '#662D91',
+          blushColor: '#C2185B',
+          eyeRig: {
+            leftEye: { cx: 42.5, cy: 42.0, rx: 8.5, ry: 10.5, rot: -4, hidden: false },
+            rightEye: { cx: 61.5, cy: 41.5, rx: 8.5, ry: 10.5, rot: 4, hidden: false },
+            blushLeft: { cx: 33.0, cy: 55.0, rx: 6.0, ry: 3.5 },
+            blushRight: { cx: 69.0, cy: 54.0, rx: 6.0, ry: 3.5 }
+          }
+        }
+      ]
     },
     rainbow: {
       id: 'rainbow',
       name: 'Rainbow Dash',
-      coatColor: '#A0D7F7',
-      eyeColor: '#BF1868',
-      blushColor: '#FF5252',
-      file: 'assets/rainbow.png',
-      cmFile: 'assets/cm-rainbow.png',
-      rig: {
-        leftEye: { cx: 32.0, cy: 46.0, rx: 9.2, ry: 10.0 },
-        rightEye: { cx: 65.0, cy: 46.0, rx: 9.2, ry: 10.0 },
-        blushLeft: { cx: 25.0, cy: 55.0, rx: 6.5, ry: 3.6 },
-        blushRight: { cx: 70.0, cy: 55.0, rx: 6.5, ry: 3.6 }
-      }
+      particleType: 'clouds',
+      quotes: [
+        'This desktop is at least 20% cooler now! ⚡',
+        'Awesome as I wanna be! 🌈',
+        'Speed is my middle name!',
+        'Clear skies ahead in 10 seconds flat!'
+      ],
+      poses: [
+        {
+          id: 'pose1',
+          label: 'Smug Standing',
+          file: 'assets/poses/rainbow-pose1.png',
+          scale: 1.0,
+          offsetY: 0,
+          coatColor: '#8EE2FF',
+          eyeColor: '#BF1868',
+          blushColor: '#FF5252',
+          eyeRig: {
+            leftEye: { cx: 43.5, cy: 49.5, rx: 9.0, ry: 11.5, rot: -4, hidden: false },
+            rightEye: { cx: 70.5, cy: 53.5, rx: 9.5, ry: 11.5, rot: 4, hidden: false },
+            blushLeft: { cx: 36.0, cy: 61.0, rx: 6.0, ry: 3.5 },
+            blushRight: { cx: 76.0, cy: 64.0, rx: 6.0, ry: 3.5 }
+          }
+        },
+        {
+          id: 'pose2',
+          label: 'Reading Chill',
+          file: 'assets/poses/rainbow-pose2.png',
+          scale: 1.0,
+          offsetY: 0,
+          coatColor: '#9DDAF6',
+          eyeColor: '#BF1868',
+          blushColor: '#FF5252',
+          eyeRig: {
+            leftEye: { cx: 62.5, cy: 37.5, rx: 4.2, ry: 5.5, rot: -3, hidden: false },
+            rightEye: { cx: 72.5, cy: 38.0, rx: 4.2, ry: 5.5, rot: 3, hidden: false },
+            blushLeft: { cx: 57.0, cy: 44.0, rx: 4.0, ry: 2.2 },
+            blushRight: { cx: 75.5, cy: 44.0, rx: 4.0, ry: 2.2 }
+          }
+        },
+        {
+          id: 'pose3',
+          label: 'Wonderbolt Ready',
+          file: 'assets/poses/rainbow-pose3.png',
+          scale: 1.0,
+          offsetY: 0,
+          coatColor: '#9DD9F8',
+          eyeColor: '#BF1868',
+          blushColor: '#FF5252',
+          eyeRig: {
+            leftEye: { cx: 70.0, cy: 31.5, rx: 6.5, ry: 8.5, rot: -3, hidden: false },
+            rightEye: { cx: 85.0, cy: 30.5, rx: 5.0, ry: 7.5, rot: 3, hidden: false },
+            blushLeft: { cx: 65.0, cy: 40.0, rx: 4.5, ry: 2.6 },
+            blushRight: { cx: 88.0, cy: 39.0, rx: 4.0, ry: 2.4 }
+          }
+        }
+      ]
     },
     fluttershy: {
       id: 'fluttershy',
       name: 'Fluttershy',
-      coatColor: '#FDF6AF',
-      eyeColor: '#39B54A',
-      blushColor: '#F48FB1',
-      file: 'assets/fluttershy.png',
-      cmFile: 'assets/cm-fluttershy.png',
-      rig: {
-        leftEye: { cx: 31.0, cy: 47.0, rx: 9.5, ry: 10.2 },
-        rightEye: { cx: 64.0, cy: 47.0, rx: 9.5, ry: 10.2 },
-        blushLeft: { cx: 24.0, cy: 56.0, rx: 6.8, ry: 3.8 },
-        blushRight: { cx: 69.0, cy: 56.0, rx: 6.8, ry: 3.8 }
-      }
+      particleType: 'butterflies',
+      quotes: [
+        'Yay... 🌸',
+        'Take a deep breath, you are doing great. 🦋',
+        'Kindness is the greatest magic of all! 💕',
+        'The little woodland critters say hello!'
+      ],
+      poses: [
+        {
+          id: 'pose1',
+          label: 'Gentle Peek',
+          file: 'assets/poses/fluttershy-pose1.png',
+          scale: 1.0,
+          offsetY: 0,
+          coatColor: '#FAF5AB',
+          eyeColor: '#39B54A',
+          blushColor: '#F48FB1',
+          eyeRig: {
+            leftEye: { cx: 36.0, cy: 63.5, rx: 11.5, ry: 15.0, rot: -4, hidden: false },
+            rightEye: { cx: 68.5, cy: 64.0, rx: 12.0, ry: 15.0, rot: 4, hidden: false },
+            blushLeft: { cx: 27.0, cy: 78.0, rx: 7.0, ry: 3.8 },
+            blushRight: { cx: 77.0, cy: 78.0, rx: 7.0, ry: 3.8 }
+          }
+        },
+        {
+          id: 'pose2',
+          label: 'Happy Stand',
+          file: 'assets/poses/fluttershy-pose2.png',
+          scale: 1.0,
+          offsetY: 0,
+          coatColor: '#FDF6AF',
+          eyeColor: '#39B54A',
+          blushColor: '#F48FB1',
+          eyeRig: {
+            leftEye: { cx: 29.0, cy: 27.5, rx: 4.0, ry: 4.8, rot: -5, hidden: false },
+            rightEye: { cx: 39.5, cy: 27.5, rx: 5.2, ry: 5.5, rot: 5, hidden: false },
+            blushLeft: { cx: 24.5, cy: 34.5, rx: 3.5, ry: 2.0 },
+            blushRight: { cx: 43.0, cy: 34.5, rx: 4.0, ry: 2.2 }
+          }
+        },
+        {
+          id: 'pose3',
+          label: 'Butterfly Sit',
+          file: 'assets/poses/fluttershy-pose3.png',
+          scale: 1.0,
+          offsetY: 0,
+          coatColor: '#FDF6AF',
+          eyeColor: '#39B54A',
+          blushColor: '#F48FB1',
+          eyeRig: {
+            leftEye: { cx: 33.0, cy: 27.0, rx: 4.8, ry: 5.8, rot: -4, hidden: false },
+            rightEye: { cx: 43.0, cy: 27.5, rx: 5.2, ry: 6.2, rot: 4, hidden: false },
+            blushLeft: { cx: 29.0, cy: 35.0, rx: 4.0, ry: 2.2 },
+            blushRight: { cx: 48.0, cy: 35.0, rx: 4.0, ry: 2.2 }
+          }
+        }
+      ]
     },
     rarity: {
       id: 'rarity',
       name: 'Rarity',
-      coatColor: '#F4F3F8',
-      eyeColor: '#2E3192',
-      blushColor: '#9575CD',
-      file: 'assets/rarity.png',
-      cmFile: 'assets/cm-rarity.png',
-      rig: {
-        leftEye: { cx: 36.0, cy: 46.5, rx: 8.8, ry: 9.8 },
-        rightEye: { cx: 63.5, cy: 46.5, rx: 8.8, ry: 9.8 },
-        blushLeft: { cx: 30.0, cy: 55.0, rx: 6.2, ry: 3.5 },
-        blushRight: { cx: 68.0, cy: 55.0, rx: 6.2, ry: 3.5 }
-      }
+      particleType: 'gems',
+      quotes: [
+        'Simply fabulous, darling! 💎',
+        'One must always maintain aesthetic perfection! ✨',
+        'Elegance is not just a style, it is a way of life!',
+        'Every detail deserves careful couture.'
+      ],
+      poses: [
+        {
+          id: 'pose1',
+          label: 'Glamour Peek',
+          file: 'assets/poses/rarity-pose1.png',
+          scale: 1.0,
+          offsetY: 0,
+          coatColor: '#EEF1F3',
+          eyeColor: '#2E3192',
+          blushColor: '#9575CD',
+          eyeRig: {
+            leftEye: { cx: 66.0, cy: 56.5, rx: 7.0, ry: 10.0, rot: -6, hidden: false },
+            rightEye: { cx: 84.0, cy: 58.5, rx: 6.8, ry: 10.0, rot: 6, hidden: false },
+            blushLeft: { cx: 60.0, cy: 67.0, rx: 5.0, ry: 3.0 },
+            blushRight: { cx: 88.0, cy: 69.0, rx: 4.5, ry: 2.8 }
+          }
+        },
+        {
+          id: 'pose2',
+          label: 'Elegant Sit',
+          file: 'assets/poses/rarity-pose2.png',
+          scale: 1.0,
+          offsetY: 0,
+          coatColor: '#EDF1F4',
+          eyeColor: '#2E3192',
+          blushColor: '#9575CD',
+          eyeRig: {
+            leftEye: { cx: 36.5, cy: 27.5, rx: 3.5, ry: 3.5, rot: 0, hidden: false },
+            rightEye: { cx: 43.5, cy: 27.5, rx: 4.5, ry: 3.8, rot: 0, hidden: false },
+            blushLeft: { cx: 31.5, cy: 33.0, rx: 3.2, ry: 2.0 },
+            blushRight: { cx: 47.0, cy: 33.5, rx: 3.5, ry: 2.0 }
+          }
+        },
+        {
+          id: 'pose3',
+          label: 'Dramatic Tilt',
+          file: 'assets/poses/rarity-pose3.png',
+          scale: 1.0,
+          offsetY: 0,
+          coatColor: '#DCDAF5',
+          eyeColor: '#2E3192',
+          blushColor: '#9575CD',
+          eyeRig: {
+            leftEye: { cx: 53.5, cy: 27.5, rx: 5.5, ry: 6.5, rot: 3, hidden: false },
+            rightEye: { cx: 39.0, cy: 27.5, rx: 4.5, ry: 4.5, rot: -3, hidden: true },
+            blushLeft: { cx: 35.0, cy: 34.5, rx: 4.2, ry: 2.5 },
+            blushRight: { cx: 58.0, cy: 34.5, rx: 4.5, ry: 2.6 }
+          }
+        }
+      ]
     },
     applejack: {
       id: 'applejack',
       name: 'Applejack',
-      coatColor: '#FDB953',
-      eyeColor: '#4A993D',
-      blushColor: '#FF7043',
-      file: 'assets/applejack.png',
-      cmFile: 'assets/cm-applejack.png',
-      rig: {
-        leftEye: { cx: 33.0, cy: 47.0, rx: 9.5, ry: 10.0 },
-        rightEye: { cx: 65.5, cy: 47.0, rx: 9.5, ry: 10.0 },
-        blushLeft: { cx: 26.0, cy: 56.0, rx: 6.8, ry: 3.8 },
-        blushRight: { cx: 71.0, cy: 56.0, rx: 6.8, ry: 3.8 }
-      }
+      particleType: 'apples',
+      quotes: [
+        'Honest work for honest ponies, sugarcube! 🍎',
+        'Do not use fancy mathematics to muddy the issue! 🤠',
+        'Stick with your friends through thick and thin!',
+        'Time for a fresh batch of apple fritters!'
+      ],
+      poses: [
+        {
+          id: 'pose1',
+          label: 'Proud Peek',
+          file: 'assets/poses/applejack-pose1.png',
+          scale: 1.0,
+          offsetY: 0,
+          coatColor: '#FABA62',
+          eyeColor: '#4A993D',
+          blushColor: '#FF7043',
+          eyeRig: {
+            leftEye: { cx: 35.5, cy: 61.0, rx: 11.5, ry: 14.5, rot: -4, hidden: false },
+            rightEye: { cx: 72.5, cy: 61.5, rx: 11.5, ry: 14.5, rot: 4, hidden: false },
+            blushLeft: { cx: 26.0, cy: 76.0, rx: 7.0, ry: 4.0 },
+            blushRight: { cx: 81.0, cy: 76.0, rx: 7.0, ry: 4.0 }
+          }
+        },
+        {
+          id: 'pose2',
+          label: 'Apple Basket',
+          file: 'assets/poses/applejack-pose2.png',
+          scale: 1.0,
+          offsetY: 0,
+          coatColor: '#FABA62',
+          eyeColor: '#4A993D',
+          blushColor: '#FF7043',
+          eyeRig: {
+            leftEye: { cx: 41.0, cy: 30.5, rx: 4.8, ry: 5.5, rot: -4, hidden: false },
+            rightEye: { cx: 51.0, cy: 30.5, rx: 5.2, ry: 5.8, rot: 4, hidden: false },
+            blushLeft: { cx: 36.0, cy: 37.5, rx: 4.2, ry: 2.4 },
+            blushRight: { cx: 56.0, cy: 37.5, rx: 4.2, ry: 2.4 }
+          }
+        },
+        {
+          id: 'pose3',
+          label: 'Honest Gaze',
+          file: 'assets/poses/applejack-pose3.png',
+          scale: 1.0,
+          offsetY: 0,
+          coatColor: '#E8A452',
+          eyeColor: '#4A993D',
+          blushColor: '#FF7043',
+          eyeRig: {
+            leftEye: { cx: 39.0, cy: 46.5, rx: 5.5, ry: 6.2, rot: -3, hidden: false },
+            rightEye: { cx: 55.0, cy: 45.5, rx: 6.5, ry: 6.8, rot: 3, hidden: false },
+            blushLeft: { cx: 34.0, cy: 55.0, rx: 4.8, ry: 2.8 },
+            blushRight: { cx: 61.0, cy: 54.0, rx: 4.8, ry: 2.8 }
+          }
+        }
+      ]
     }
   };
 
-  let currentCharacterId = 'pinkie';
+  // Restore saved character & pose preference
+  let currentCharacterId = localStorage.getItem('pony_active_char') || 'pinkie';
+  if (!MANE_6_CHARACTERS[currentCharacterId]) currentCharacterId = 'pinkie';
+  let currentPoseIndex = parseInt(localStorage.getItem('pony_active_pose') || '0', 10);
+  if (isNaN(currentPoseIndex) || currentPoseIndex < 0 || currentPoseIndex > 2) currentPoseIndex = 0;
 
   /* ==========================================================================
      3. Global State & Lively Playback Control
@@ -456,6 +754,8 @@
   let isChillMode = localStorage.getItem('pony_wallpaper_mode') === 'chill';
   let popupStickerThreshold = 7;
   let animFrameId = null;
+  let lastUserActivityTime = performance.now();
+  let isSleepyActive = false;
 
   function updatePlaybackPause(shouldPause) {
     isPaused = shouldPause;
@@ -488,7 +788,7 @@
   };
 
   /* ==========================================================================
-     4. Custom Y2K Pixel Cursor & Click Particles
+     4. Custom Y2K Pixel Cursor & Parallax Lerp
      ========================================================================== */
 
   const cursorEl = document.getElementById('retro-cursor');
@@ -499,18 +799,24 @@
   let mouseY = window.innerHeight / 2;
   let lastSparkleTime = 0;
 
-  // Parallax Gaze Tracking Targets & Smooth Lerp
   let targetParallaxX = 0;
   let targetParallaxY = 0;
   let currentParallaxX = 0;
   let currentParallaxY = 0;
 
+  function recordUserActivity() {
+    lastUserActivityTime = performance.now();
+    if (isSleepyActive) {
+      wakeUpFromSleepy();
+    }
+  }
+
   window.addEventListener('pointermove', (e) => {
+    recordUserActivity();
     mouseX = e.clientX;
     mouseY = e.clientY;
     cursorEl.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
 
-    // Calculate normalized cursor offset from screen center (-1.0 to 1.0)
     const cx = window.innerWidth / 2;
     const cy = window.innerHeight / 2;
     targetParallaxX = (mouseX - cx) / cx;
@@ -522,6 +828,9 @@
       lastSparkleTime = now;
     }
   });
+
+  window.addEventListener('pointerdown', recordUserActivity);
+  window.addEventListener('keydown', recordUserActivity);
 
   function spawnMouseSparkle(x, y) {
     const sparkle = document.createElement('div');
@@ -554,114 +863,261 @@
   }
 
   /* ==========================================================================
-     5. Milestone 1: Offscreen Star Cache & GPU Starfield Canvas
+     5. Task 7: Theme-Morphing Ambient Background Particles Canvas
      ========================================================================== */
 
   const starCanvas = document.getElementById('starfield-canvas');
   const starCtx = starCanvas.getContext('2d');
-  let stars = [];
+  let ambientParticles = [];
   let starDensity = 42;
-  const starSpriteCache = {};
+  const particleSpriteCache = {};
 
-  const STAR_PALETTE = ['#FFFFFF', '#FFD6E7', '#FFB5D3', '#FFA8CE', '#FFE5F1', '#E1BEE7', '#B3E5FC'];
-  const STAR_SIZES = [4, 7, 10, 13];
-
-  function preRenderStarCache() {
-    STAR_PALETTE.forEach((color) => {
+  function preRenderParticleSprites() {
+    // 1. Classic Stars
+    const starColors = ['#FFFFFF', '#FFD6E7', '#FFB5D3', '#FFA8CE', '#E1BEE7', '#B3E5FC'];
+    starColors.forEach((col) => {
       [4, 5].forEach((spikes) => {
-        STAR_SIZES.forEach((sz) => {
-          const key = `${color}_${spikes}_${sz}`;
+        [6, 10, 14].forEach((sz) => {
+          const off = document.createElement('canvas');
           const pad = 12;
           const w = sz * 2 + pad * 2;
-          const h = sz * 2 + pad * 2;
-
-          const off = document.createElement('canvas');
           off.width = w;
-          off.height = h;
+          off.height = w;
           const oCtx = off.getContext('2d');
-
-          oCtx.translate(w / 2, h / 2);
+          oCtx.translate(w / 2, w / 2);
           oCtx.beginPath();
           const step = Math.PI / spikes;
-          const outerR = sz;
-          const innerR = sz * 0.42;
-
           for (let i = 0; i < spikes * 2; i++) {
-            const r = i % 2 === 0 ? outerR : innerR;
+            const r = i % 2 === 0 ? sz : sz * 0.42;
             const x = Math.cos(i * step) * r;
             const y = Math.sin(i * step) * r;
             if (i === 0) oCtx.moveTo(x, y);
             else oCtx.lineTo(x, y);
           }
           oCtx.closePath();
-          oCtx.fillStyle = color;
-          oCtx.shadowColor = 'rgba(255, 181, 211, 0.7)';
+          oCtx.fillStyle = col;
+          oCtx.shadowColor = col;
           oCtx.shadowBlur = 6;
           oCtx.fill();
-
-          starSpriteCache[key] = {
-            canvas: off,
-            halfW: w / 2,
-            halfH: h / 2
-          };
+          particleSpriteCache[`star_${col}_${spikes}_${sz}`] = off;
         });
       });
     });
+
+    // 2. Balloons / Confetti (Pinkie)
+    const balloonColors = ['#FF4081', '#FF80AB', '#00E5FF', '#FFD600', '#76FF03'];
+    balloonColors.forEach((col) => {
+      const off = document.createElement('canvas');
+      off.width = 32;
+      off.height = 40;
+      const oCtx = off.getContext('2d');
+      oCtx.fillStyle = col;
+      oCtx.shadowColor = col;
+      oCtx.shadowBlur = 4;
+      oCtx.beginPath();
+      oCtx.ellipse(16, 16, 11, 14, 0, 0, Math.PI * 2);
+      oCtx.fill();
+      oCtx.beginPath();
+      oCtx.moveTo(14, 30);
+      oCtx.lineTo(18, 30);
+      oCtx.lineTo(16, 33);
+      oCtx.closePath();
+      oCtx.fill();
+      particleSpriteCache[`balloon_${col}`] = off;
+    });
+
+    // 3. Mini Butterflies (Fluttershy)
+    const fsColors = ['#00E5FF', '#FF4081', '#FFF176'];
+    fsColors.forEach((col) => {
+      const off = document.createElement('canvas');
+      off.width = 30;
+      off.height = 30;
+      const oCtx = off.getContext('2d');
+      oCtx.fillStyle = col;
+      oCtx.globalAlpha = 0.85;
+      oCtx.beginPath();
+      oCtx.ellipse(10, 12, 8, 5, -0.5, 0, Math.PI * 2);
+      oCtx.ellipse(20, 12, 8, 5, 0.5, 0, Math.PI * 2);
+      oCtx.fill();
+      particleSpriteCache[`butterfly_${col}`] = off;
+    });
+
+    // 4. Diamonds / Gems (Rarity)
+    const gemColors = ['#E1F5FE', '#80DEEA', '#B39DDB', '#FFFFFF'];
+    gemColors.forEach((col) => {
+      const off = document.createElement('canvas');
+      off.width = 28;
+      off.height = 28;
+      const oCtx = off.getContext('2d');
+      oCtx.fillStyle = col;
+      oCtx.shadowColor = col;
+      oCtx.shadowBlur = 5;
+      oCtx.beginPath();
+      oCtx.moveTo(14, 2);
+      oCtx.lineTo(26, 14);
+      oCtx.lineTo(14, 26);
+      oCtx.lineTo(2, 14);
+      oCtx.closePath();
+      oCtx.fill();
+      particleSpriteCache[`gem_${col}`] = off;
+    });
+
+    // 5. Apples (Applejack)
+    ['#FF1744', '#FFD600'].forEach((col) => {
+      const off = document.createElement('canvas');
+      off.width = 28;
+      off.height = 28;
+      const oCtx = off.getContext('2d');
+      oCtx.fillStyle = col;
+      oCtx.beginPath();
+      oCtx.arc(11, 15, 8, 0, Math.PI * 2);
+      oCtx.arc(17, 15, 8, 0, Math.PI * 2);
+      oCtx.fill();
+      oCtx.fillStyle = '#4CAF50';
+      oCtx.fillRect(13, 4, 3, 6);
+      particleSpriteCache[`apple_${col}`] = off;
+    });
+
+    // 6. Arcane 6-Point Magic Stars (Twilight Sparkle)
+    ['#E040FB', '#CE93D8', '#FFF9A6'].forEach((col) => {
+      const off = document.createElement('canvas');
+      off.width = 32;
+      off.height = 32;
+      const oCtx = off.getContext('2d');
+      oCtx.translate(16, 16);
+      oCtx.fillStyle = col;
+      oCtx.shadowColor = '#9C27B0';
+      oCtx.shadowBlur = 5;
+      oCtx.beginPath();
+      for (let i = 0; i < 12; i++) {
+        const r = i % 2 === 0 ? 12 : 4.5;
+        const a = (i * Math.PI) / 6;
+        if (i === 0) oCtx.moveTo(Math.cos(a) * r, Math.sin(a) * r);
+        else oCtx.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+      }
+      oCtx.closePath();
+      oCtx.fill();
+      particleSpriteCache[`magic_${col}`] = off;
+    });
+
+    // 7. Fluffy Clouds & Mini Lightning Bolts (Rainbow Dash)
+    const cloudOff = document.createElement('canvas');
+    cloudOff.width = 44;
+    cloudOff.height = 28;
+    const cCtx = cloudOff.getContext('2d');
+    cCtx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+    cCtx.shadowColor = '#80DEEA';
+    cCtx.shadowBlur = 4;
+    cCtx.beginPath();
+    cCtx.arc(14, 16, 8, 0, Math.PI * 2);
+    cCtx.arc(22, 12, 10, 0, Math.PI * 2);
+    cCtx.arc(30, 16, 8, 0, Math.PI * 2);
+    cCtx.fill();
+    particleSpriteCache['cloud_white'] = cloudOff;
+
+    const boltOff = document.createElement('canvas');
+    boltOff.width = 24;
+    boltOff.height = 30;
+    const bCtx = boltOff.getContext('2d');
+    bCtx.fillStyle = '#FFD600';
+    bCtx.shadowColor = '#00E5FF';
+    bCtx.shadowBlur = 4;
+    bCtx.beginPath();
+    bCtx.moveTo(14, 2);
+    bCtx.lineTo(6, 16);
+    bCtx.lineTo(12, 16);
+    bCtx.lineTo(9, 28);
+    bCtx.lineTo(19, 13);
+    bCtx.lineTo(13, 13);
+    bCtx.closePath();
+    bCtx.fill();
+    particleSpriteCache['cloud_bolt'] = boltOff;
   }
 
   function resizeStarCanvas() {
     const dpr = window.devicePixelRatio || 1;
     starCanvas.width = window.innerWidth * dpr;
     starCanvas.height = window.innerHeight * dpr;
-    starCtx.scale(dpr, dpr);
-    initStars();
+    starCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    initAmbientParticles();
+    fitRigFrame();
   }
 
-  function initStars() {
-    stars = [];
+  function initAmbientParticles() {
+    ambientParticles = [];
     for (let i = 0; i < starDensity; i++) {
-      const spikes = Math.random() > 0.4 ? 4 : 5;
-      const szIdx = Math.floor(Math.random() * STAR_SIZES.length);
-      const sz = STAR_SIZES[szIdx];
-      const color = STAR_PALETTE[Math.floor(Math.random() * STAR_PALETTE.length)];
-      stars.push({
-        x: Math.random() * window.innerWidth,
-        y: Math.random() * window.innerHeight,
-        speedX: -0.2 - Math.random() * 0.4,
-        speedY: 0.1 + Math.random() * 0.35,
-        rotation: Math.random() * Math.PI * 2,
-        rotSpeed: (Math.random() - 0.5) * 0.02,
-        alpha: 0.35 + Math.random() * 0.65,
-        cacheKey: `${color}_${spikes}_${sz}`
-      });
+      ambientParticles.push(createAmbientParticle(true));
     }
   }
 
-  function renderStars() {
+  function createAmbientParticle(randomY = false) {
+    const char = MANE_6_CHARACTERS[currentCharacterId] || MANE_6_CHARACTERS.pinkie;
+    const pType = char.particleType || 'balloons';
+    let sprite = null;
+
+    if (pType === 'balloons') {
+      const cols = ['#FF4081', '#FF80AB', '#00E5FF', '#FFD600', '#76FF03'];
+      sprite = particleSpriteCache[`balloon_${cols[Math.floor(Math.random() * cols.length)]}`];
+    } else if (pType === 'butterflies') {
+      const cols = ['#00E5FF', '#FF4081', '#FFF176'];
+      sprite = particleSpriteCache[`butterfly_${cols[Math.floor(Math.random() * cols.length)]}`];
+    } else if (pType === 'gems') {
+      const cols = ['#E1F5FE', '#80DEEA', '#B39DDB', '#FFFFFF'];
+      sprite = particleSpriteCache[`gem_${cols[Math.floor(Math.random() * cols.length)]}`];
+    } else if (pType === 'apples') {
+      const cols = ['#FF1744', '#FFD600'];
+      sprite = particleSpriteCache[`apple_${cols[Math.floor(Math.random() * cols.length)]}`];
+    } else if (pType === 'magic') {
+      const cols = ['#E040FB', '#CE93D8', '#FFF9A6'];
+      sprite = particleSpriteCache[`magic_${cols[Math.floor(Math.random() * cols.length)]}`];
+    } else if (pType === 'clouds') {
+      sprite = Math.random() > 0.3 ? particleSpriteCache['cloud_white'] : particleSpriteCache['cloud_bolt'];
+    } else {
+      const cols = ['#FFFFFF', '#FFD6E7', '#FFB5D3', '#E1BEE7', '#B3E5FC'];
+      const c = cols[Math.floor(Math.random() * cols.length)];
+      sprite = particleSpriteCache[`star_${c}_${Math.random() > 0.4 ? 4 : 5}_10`];
+    }
+
+    return {
+      x: Math.random() * window.innerWidth,
+      y: randomY ? Math.random() * window.innerHeight : window.innerHeight + 20,
+      speedX: (Math.random() - 0.5) * 0.7,
+      speedY: -0.3 - Math.random() * 0.6,
+      rot: Math.random() * Math.PI * 2,
+      rotSpeed: (Math.random() - 0.5) * 0.02,
+      alpha: 0.35 + Math.random() * 0.6,
+      scale: 0.7 + Math.random() * 0.6,
+      sprite: sprite
+    };
+  }
+
+  function renderAmbientParticles() {
     starCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-    for (let i = 0; i < stars.length; i++) {
-      const s = stars[i];
-      s.x += s.speedX;
-      s.y += s.speedY;
-      s.rotation += s.rotSpeed;
+    for (let i = 0; i < ambientParticles.length; i++) {
+      const p = ambientParticles[i];
+      p.x += p.speedX;
+      p.y += p.speedY;
+      p.rot += p.rotSpeed;
 
-      if (s.x < -20) s.x = window.innerWidth + 20;
-      if (s.y > window.innerHeight + 20) s.y = -20;
+      if (p.y < -35) {
+        ambientParticles[i] = createAmbientParticle(false);
+        continue;
+      }
 
-      const sprite = starSpriteCache[s.cacheKey];
-      if (sprite) {
+      if (p.sprite) {
         starCtx.save();
-        starCtx.translate(s.x, s.y);
-        starCtx.rotate(s.rotation);
-        starCtx.globalAlpha = s.alpha;
-        starCtx.drawImage(sprite.canvas, -sprite.halfW, -sprite.halfH);
+        starCtx.translate(p.x, p.y);
+        starCtx.rotate(p.rot);
+        starCtx.scale(p.scale, p.scale);
+        starCtx.globalAlpha = p.alpha;
+        starCtx.drawImage(p.sprite, -p.sprite.width / 2, -p.sprite.height / 2);
         starCtx.restore();
       }
     }
   }
 
   /* ==========================================================================
-     6. Milestone 3: Center Stage Pony Rig & Dynamic Expression Controller
+     6. Tasks 2 & 3: Locked Vector Face Rig & Live Calibration Architecture
      ========================================================================== */
 
   const pinkieCharacter = document.getElementById('pinkie-character');
@@ -669,62 +1125,221 @@
   const pinkieSvgFallback = document.getElementById('pinkie-svg-fallback');
   const stickerSurface = document.getElementById('sticker-surface');
 
+  const rigEyeLeftGroup = document.getElementById('rig-eye-left-group');
+  const rigEyeRightGroup = document.getElementById('rig-eye-right-group');
   const rigPatchLeft = document.getElementById('rig-eye-patch-left');
   const rigPatchRight = document.getElementById('rig-eye-patch-right');
+  const rigLashLeft = document.getElementById('rig-lash-left');
+  const rigLashRight = document.getElementById('rig-lash-right');
+  const rigLashLeftAcc1 = document.getElementById('rig-lash-left-acc1');
+  const rigLashLeftAcc2 = document.getElementById('rig-lash-left-acc2');
+  const rigLashRightAcc1 = document.getElementById('rig-lash-right-acc1');
+  const rigLashRightAcc2 = document.getElementById('rig-lash-right-acc2');
+
   const rigBlushLeft = document.getElementById('rig-blush-left');
   const rigBlushRight = document.getElementById('rig-blush-right');
   const rigStarEyeLeft = document.getElementById('rig-star-eye-left');
   const rigStarEyeRight = document.getElementById('rig-star-eye-right');
+  const tunerBboxLeft = document.getElementById('tuner-bbox-left');
+  const tunerBboxRight = document.getElementById('tuner-bbox-right');
+
+  const speechBubble = document.getElementById('pony-speech-bubble');
+  const speechBubbleText = document.getElementById('speech-bubble-text');
+  let speechBubbleTimeout = null;
 
   let exprTimeout = null;
-  let lastClickTime = 0;
+  let lastReactionTime = 0;
   let useSvgFallback = false;
+  let sleepyZzzTimer = null;
 
-  function switchMainCharacter(ponyId) {
-    const char = MANE_6_CHARACTERS[ponyId];
-    if (!char) return;
-    currentCharacterId = ponyId;
+  // Offscreen canvas for alpha-aware sticker testing
+  let alphaCanvas = document.createElement('canvas');
+  let alphaCtx = alphaCanvas.getContext('2d');
+  let alphaImageData = null;
 
-    document.body.dataset.pony = ponyId;
-    document.documentElement.style.setProperty('--character-coat-color', char.coatColor);
-    document.documentElement.style.setProperty('--character-eye-color', char.eyeColor);
+  function fitRigFrame() {
+    const rigFrameEl = document.getElementById('pinkie-rig-frame');
+    const wrapperEl = document.getElementById('pinkie-wrapper');
+    if (!rigFrameEl || !wrapperEl || !pinkieIdleImg.naturalWidth || !pinkieIdleImg.naturalHeight) return;
 
-    // Update main image
-    pinkieIdleImg.src = char.file;
-    pinkieIdleImg.alt = char.name;
+    const maxW = wrapperEl.clientWidth || 500;
+    const maxH = wrapperEl.clientHeight || 500;
+    const scale = Math.min(maxW / pinkieIdleImg.naturalWidth, maxH / pinkieIdleImg.naturalHeight);
+    rigFrameEl.style.width = `${Math.round(pinkieIdleImg.naturalWidth * scale)}px`;
+    rigFrameEl.style.height = `${Math.round(pinkieIdleImg.naturalHeight * scale)}px`;
+  }
 
-    // Adapt Vector Face Rig coordinates
-    if (rigPatchLeft && rigPatchRight && char.rig) {
-      rigPatchLeft.setAttribute('cx', char.rig.leftEye.cx);
-      rigPatchLeft.setAttribute('cy', char.rig.leftEye.cy);
-      rigPatchLeft.setAttribute('rx', char.rig.leftEye.rx);
-      rigPatchLeft.setAttribute('ry', char.rig.leftEye.ry);
+  function getCurrentPose() {
+    const char = MANE_6_CHARACTERS[currentCharacterId] || MANE_6_CHARACTERS.pinkie;
+    const poses = char.poses || [];
+    return poses[currentPoseIndex] || poses[0];
+  }
 
-      rigPatchRight.setAttribute('cx', char.rig.rightEye.cx);
-      rigPatchRight.setAttribute('cy', char.rig.rightEye.cy);
-      rigPatchRight.setAttribute('rx', char.rig.rightEye.rx);
-      rigPatchRight.setAttribute('ry', char.rig.rightEye.ry);
+  function updateEyeRigUI(eyeRig) {
+    if (!eyeRig) return;
+    const l = eyeRig.leftEye;
+    const r = eyeRig.rightEye;
+    const bl = eyeRig.blushLeft;
+    const br = eyeRig.blushRight;
 
-      if (rigBlushLeft && rigBlushRight && char.rig.blushLeft) {
-        rigBlushLeft.setAttribute('cx', char.rig.blushLeft.cx);
-        rigBlushLeft.setAttribute('cy', char.rig.blushLeft.cy);
-        rigBlushRight.setAttribute('cx', char.rig.blushRight.cx);
-        rigBlushRight.setAttribute('cy', char.rig.blushRight.cy);
+    // 1. Left Eye Group
+    if (rigEyeLeftGroup && l) {
+      rigEyeLeftGroup.setAttribute('transform', `translate(${l.cx}, ${l.cy}) rotate(${l.rot || 0})`);
+      rigEyeLeftGroup.style.display = l.hidden ? 'none' : '';
+      if (rigPatchLeft) {
+        rigPatchLeft.setAttribute('rx', l.rx);
+        rigPatchLeft.setAttribute('ry', l.ry);
       }
+      if (rigLashLeft) {
+        rigLashLeft.setAttribute('d', `M ${-l.rx * 0.85} ${l.ry * 0.15} Q 0 ${-l.ry * 0.78} ${l.rx * 0.85} ${l.ry * 0.15}`);
+      }
+      if (rigLashLeftAcc1) {
+        rigLashLeftAcc1.setAttribute('d', `M ${-l.rx * 0.7} ${-l.ry * 0.05} L ${-l.rx * 1.05} ${-l.ry * 0.35}`);
+      }
+      if (rigLashLeftAcc2) {
+        rigLashLeftAcc2.setAttribute('d', `M ${-l.rx * 0.35} ${-l.ry * 0.45} L ${-l.rx * 0.55} ${-l.ry * 0.8}`);
+      }
+      if (rigStarEyeLeft) {
+        rigStarEyeLeft.setAttribute('transform', `translate(${l.cx}, ${l.cy})`);
+        rigStarEyeLeft.style.display = l.hidden ? 'none' : '';
+      }
+      if (tunerBboxLeft) {
+        tunerBboxLeft.setAttribute('x', -l.rx);
+        tunerBboxLeft.setAttribute('y', -l.ry);
+        tunerBboxLeft.setAttribute('width', l.rx * 2);
+        tunerBboxLeft.setAttribute('height', l.ry * 2);
+      }
+    }
+
+    // 2. Right Eye Group
+    if (rigEyeRightGroup && r) {
+      rigEyeRightGroup.setAttribute('transform', `translate(${r.cx}, ${r.cy}) rotate(${r.rot || 0})`);
+      rigEyeRightGroup.style.display = r.hidden ? 'none' : '';
+      if (rigPatchRight) {
+        rigPatchRight.setAttribute('rx', r.rx);
+        rigPatchRight.setAttribute('ry', r.ry);
+      }
+      if (rigLashRight) {
+        rigLashRight.setAttribute('d', `M ${-r.rx * 0.85} ${r.ry * 0.15} Q 0 ${-r.ry * 0.78} ${r.rx * 0.85} ${r.ry * 0.15}`);
+      }
+      if (rigLashRightAcc1) {
+        rigLashRightAcc1.setAttribute('d', `M ${r.rx * 0.7} ${-r.ry * 0.05} L ${r.rx * 1.05} ${-r.ry * 0.35}`);
+      }
+      if (rigLashRightAcc2) {
+        rigLashRightAcc2.setAttribute('d', `M ${r.rx * 0.35} ${-r.ry * 0.45} L ${r.rx * 0.55} ${-r.ry * 0.8}`);
+      }
+      if (rigStarEyeRight) {
+        rigStarEyeRight.setAttribute('transform', `translate(${r.cx}, ${r.cy})`);
+        rigStarEyeRight.style.display = r.hidden ? 'none' : '';
+      }
+      if (tunerBboxRight) {
+        tunerBboxRight.setAttribute('x', -r.rx);
+        tunerBboxRight.setAttribute('y', -r.ry);
+        tunerBboxRight.setAttribute('width', r.rx * 2);
+        tunerBboxRight.setAttribute('height', r.ry * 2);
+      }
+    }
+
+    // 3. Blushes
+    if (rigBlushLeft && bl) {
+      rigBlushLeft.setAttribute('cx', bl.cx);
+      rigBlushLeft.setAttribute('cy', bl.cy);
+      rigBlushLeft.setAttribute('rx', bl.rx);
+      rigBlushLeft.setAttribute('ry', bl.ry);
+    }
+    if (rigBlushRight && br) {
+      rigBlushRight.setAttribute('cx', br.cx);
+      rigBlushRight.setAttribute('cy', br.cy);
+      rigBlushRight.setAttribute('rx', br.rx);
+      rigBlushRight.setAttribute('ry', br.ry);
+    }
+  }
+
+  function applyActivePose(skipEffect = false) {
+    const char = MANE_6_CHARACTERS[currentCharacterId] || MANE_6_CHARACTERS.pinkie;
+    const pose = getCurrentPose();
+    if (!pose) return;
+
+    document.body.dataset.pony = currentCharacterId;
+    document.documentElement.style.setProperty('--character-coat-color', pose.coatColor || '#F6B2D1');
+    document.documentElement.style.setProperty('--character-eye-color', pose.eyeColor || '#4792B3');
+    document.documentElement.style.setProperty('--character-blush-1', pose.blushColor || '#FF4F93');
+
+    // Update sprite image & rig-frame transform (keeps SVG & stickers locked 1:1)
+    pinkieIdleImg.src = pose.file;
+    pinkieIdleImg.alt = `${char.name} (${pose.label})`;
+    const rigFrameEl = document.getElementById('pinkie-rig-frame');
+    if (rigFrameEl) {
+      rigFrameEl.style.transform = `translateY(${pose.offsetY || 0}px) scale(${pose.scale || 1.0})`;
+    }
+    fitRigFrame();
+
+    updateEyeRigUI(pose.eyeRig);
+
+    // Update Pose Switcher button text & title
+    const btnPoseSwitch = document.getElementById('btn-pose-switch');
+    if (btnPoseSwitch) {
+      btnPoseSwitch.title = `Current: ${char.name} - ${pose.label} (Pose ${currentPoseIndex + 1}/3) - Click to cycle poses`;
     }
 
     // Update dock active buttons
     const dockButtons = document.querySelectorAll('.pony-dock-btn');
     dockButtons.forEach((btn) => {
-      btn.classList.toggle('active', btn.dataset.pony === ponyId);
+      btn.classList.toggle('active', btn.dataset.pony === currentCharacterId);
     });
 
-    soundFX.playPonySwitchChime(ponyId);
-    executeSignatureEffect(ponyId);
+    // Save preferences
+    localStorage.setItem('pony_active_char', currentCharacterId);
+    localStorage.setItem('pony_active_pose', currentPoseIndex.toString());
+
+    if (!skipEffect) {
+      soundFX.playPonySwitchChime(currentCharacterId);
+      executeSignatureEffect(currentCharacterId);
+    }
   }
 
+  function switchMainCharacter(ponyId) {
+    if (!MANE_6_CHARACTERS[ponyId]) return;
+    currentCharacterId = ponyId;
+    currentPoseIndex = 0; // reset to pose 1 on pony switch
+    applyActivePose(false);
+    initAmbientParticles(); // morph background particles
+  }
+
+  function cycleCharacterPose() {
+    const char = MANE_6_CHARACTERS[currentCharacterId];
+    if (!char || !char.poses) return;
+    currentPoseIndex = (currentPoseIndex + 1) % char.poses.length;
+    applyActivePose(true);
+    soundFX.playStickerPop();
+    triggerPonyReaction('wink');
+  }
+
+  // Sample Alpha Mask & fit Rig Frame 1:1 on image load
+  pinkieIdleImg.addEventListener('load', () => {
+    fitRigFrame();
+    try {
+      const w = pinkieIdleImg.naturalWidth || 400;
+      const h = pinkieIdleImg.naturalHeight || 400;
+      alphaCanvas.width = w;
+      alphaCanvas.height = h;
+      alphaCtx.clearRect(0, 0, w, h);
+      alphaCtx.drawImage(pinkieIdleImg, 0, 0, w, h);
+      alphaImageData = alphaCtx.getImageData(0, 0, w, h).data;
+    } catch (e) {
+      alphaImageData = null;
+    }
+  });
+
+  pinkieIdleImg.addEventListener('error', () => {
+    useSvgFallback = true;
+    const rigFrame = document.getElementById('pinkie-rig-frame');
+    if (rigFrame) rigFrame.style.display = 'none';
+    pinkieSvgFallback.style.display = 'flex';
+  });
+
   function clearAllExpressions() {
-    pinkieCharacter.classList.remove('expr-blink', 'expr-happy', 'expr-wink', 'expr-starry');
+    pinkieCharacter.classList.remove('expr-blink', 'expr-happy', 'expr-wink', 'expr-starry', 'expr-sleepy', 'expr-shy');
   }
 
   function triggerPonyReaction(forcedExpr = null) {
@@ -735,9 +1350,9 @@
     const now = performance.now();
     let chosenExpr = forcedExpr;
     if (!chosenExpr) {
-      chosenExpr = (now - lastClickTime < 550) ? 'wink' : 'happy';
+      chosenExpr = (now - lastReactionTime < 550) ? 'wink' : 'happy';
     }
-    lastClickTime = now;
+    lastReactionTime = now;
 
     clearAllExpressions();
     pinkieCharacter.classList.add(`expr-${chosenExpr}`);
@@ -762,16 +1377,17 @@
           closedEyes.style.display = 'none';
         }
       }
-    }, chosenExpr === 'starry' ? 1200 : 450);
+    }, chosenExpr === 'starry' ? 1200 : (chosenExpr === 'shy' ? 1400 : 450));
   }
 
-  // Idle natural blink timer (checked against isPaused)
+  // Idle natural blink timer (checked against isPaused & isSleepyActive)
   setInterval(() => {
-    if (isPaused) return;
+    if (isPaused || isSleepyActive) return;
     const isBusy =
       pinkieCharacter.classList.contains('expr-happy') ||
       pinkieCharacter.classList.contains('expr-wink') ||
-      pinkieCharacter.classList.contains('expr-starry');
+      pinkieCharacter.classList.contains('expr-starry') ||
+      pinkieCharacter.classList.contains('expr-shy');
 
     if (!isBusy) {
       pinkieCharacter.classList.add('expr-blink');
@@ -781,15 +1397,54 @@
     }
   }, 3800);
 
-  pinkieIdleImg.addEventListener('error', () => {
-    useSvgFallback = true;
-    const rigFrame = document.getElementById('pinkie-rig-frame');
-    if (rigFrame) rigFrame.style.display = 'none';
-    pinkieSvgFallback.style.display = 'flex';
-  });
+  // Inactivity Sleepy Trigger (Task 7)
+  setInterval(() => {
+    if (isPaused || isSleepyActive) return;
+    const now = performance.now();
+    const threshold = isChillMode ? 8000 : 30000;
+    if (now - lastUserActivityTime > threshold) {
+      triggerSleepyState();
+    }
+  }, 3000);
+
+  function triggerSleepyState() {
+    if (isSleepyActive) return;
+    isSleepyActive = true;
+    clearAllExpressions();
+    pinkieCharacter.classList.add('expr-sleepy');
+    spawnSleepyZzz();
+  }
+
+  function wakeUpFromSleepy() {
+    if (!isSleepyActive) return;
+    isSleepyActive = false;
+    clearTimeout(sleepyZzzTimer);
+    sleepyZzzTimer = null;
+    clearAllExpressions();
+    triggerPonyReaction('wink');
+  }
+
+  function spawnSleepyZzz() {
+    clearTimeout(sleepyZzzTimer);
+    if (!isSleepyActive || isPaused) return;
+    const zzzContainer = document.getElementById('sleepy-zzz-container');
+    if (!zzzContainer) return;
+
+    const z = document.createElement('div');
+    z.className = 'pixel-zzz';
+    z.textContent = 'Zzz';
+    z.style.left = '62%';
+    z.style.top = '28%';
+    zzzContainer.appendChild(z);
+
+    setTimeout(() => z.remove(), 2600);
+    if (isSleepyActive) {
+      sleepyZzzTimer = setTimeout(spawnSleepyZzz, 1800);
+    }
+  }
 
   /* ==========================================================================
-     7. Milestone 3: Interactive Sticker Slapping, Harmony Combo & Party Cannon
+     7. Task 5: Alpha-Aware Smart Sticker Placement (Avoid Eyes)
      ========================================================================== */
 
   const STICKER_CONFIGS = [
@@ -814,15 +1469,19 @@
 
   stickerSurface.addEventListener('pointerdown', (e) => {
     if (isCascadeActive) return;
-
     soundFX.init();
 
     const rect = stickerSurface.getBoundingClientRect();
     const clickX = e.clientX - rect.left;
     const clickY = e.clientY - rect.top;
 
-    const pctX = (clickX / rect.width) * 100;
-    const pctY = (clickY / rect.height) * 100;
+    let pctX = (clickX / rect.width) * 100;
+    let pctY = (clickY / rect.height) * 100;
+
+    // Smart Sticker Placement: Check eye exclusion & alpha transparency
+    const smartTarget = calculateSmartStickerPlacement(pctX, pctY);
+    pctX = smartTarget.x;
+    pctY = smartTarget.y;
 
     triggerClickRipple(e.clientX, e.clientY);
     triggerPonyReaction();
@@ -830,6 +1489,57 @@
 
     slapSticker(pctX, pctY);
   });
+
+  function isPointValidForSticker(pctX, pctY, eyeRig) {
+    if (pctX < 6 || pctX > 94 || pctY < 6 || pctY > 94) return false;
+    const l = eyeRig.leftEye;
+    const r = eyeRig.rightEye;
+    const exclusionRadius = 13.0;
+    const distL = l && !l.hidden ? Math.hypot(pctX - l.cx, pctY - l.cy) : 999;
+    const distR = r && !r.hidden ? Math.hypot(pctX - r.cx, pctY - r.cy) : 999;
+    if (distL < exclusionRadius || distR < exclusionRadius) return false;
+
+    if (alphaImageData && alphaCanvas.width > 0) {
+      const px = Math.max(0, Math.min(alphaCanvas.width - 1, Math.floor((pctX / 100) * alphaCanvas.width)));
+      const py = Math.max(0, Math.min(alphaCanvas.height - 1, Math.floor((pctY / 100) * alphaCanvas.height)));
+      const idx = (py * alphaCanvas.width + px) * 4 + 3;
+      if ((alphaImageData[idx] || 0) < 35) return false;
+    }
+    return true;
+  }
+
+  function calculateSmartStickerPlacement(pctX, pctY) {
+    const pose = getCurrentPose();
+    if (!pose || !pose.eyeRig) return { x: pctX, y: pctY };
+
+    if (isPointValidForSticker(pctX, pctY, pose.eyeRig)) {
+      return { x: pctX, y: pctY };
+    }
+
+    // Spiral search outward & slightly toward character silhouette center (50, 58)
+    for (let radius = 8; radius <= 48; radius += 5) {
+      for (let step = 0; step < 12; step++) {
+        const angle = (step / 12) * Math.PI * 2;
+        const candX = pctX + Math.cos(angle) * radius;
+        const candY = pctY + Math.sin(angle) * radius;
+        if (isPointValidForSticker(candX, candY, pose.eyeRig)) {
+          return { x: candX, y: candY };
+        }
+      }
+    }
+
+    // Safe fallback on lower chest/cheek silhouette
+    const fallbacks = [
+      { x: 50, y: 74 },
+      { x: 38, y: 76 },
+      { x: 62, y: 76 },
+      { x: 50, y: 24 }
+    ];
+    for (const fb of fallbacks) {
+      if (isPointValidForSticker(fb.x, fb.y, pose.eyeRig)) return fb;
+    }
+    return { x: 50, y: 75 };
+  }
 
   function slapSticker(pctX, pctY) {
     const config = STICKER_CONFIGS[stickerCycleIndex % STICKER_CONFIGS.length];
@@ -855,13 +1565,13 @@
 
     stickerSurface.appendChild(el);
 
-    // Check Milestone 3: Elements of Harmony Combo (All 6 Mane 6 cutie marks placed!)
+    // Check Milestone 3: Elements of Harmony Combo
     if (activeRoundCutieMarks.size === 6) {
       triggerElementsOfHarmonyCombo();
       return;
     }
 
-    // Check Popup Threshold in Party Mode (Chill mode suppresses disruptive popup cascade)
+    // Check Popup Threshold in Party Mode
     if (!isChillMode && currentStickerCount >= popupStickerThreshold) {
       isCascadeActive = true;
       setTimeout(() => {
@@ -870,7 +1580,379 @@
     }
   }
 
-  /** Milestone 3: Full-Screen 6-Color Rainbow Combo */
+  /* ==========================================================================
+     8. Task 5: Head-Pat (Petting) Gesture & Double-Click Speech Bubbles
+     ========================================================================== */
+
+  const rigFrame = document.getElementById('pinkie-rig-frame');
+  const headpatContainer = document.getElementById('headpat-container');
+
+  let patHistory = [];
+  let lastDirection = 0;
+  let patReversals = 0;
+  let patStartTime = 0;
+
+  // Head-Pat Listener attached to stickerSurface (which sits directly over rigFrame)
+  stickerSurface.addEventListener('pointermove', (e) => {
+    if (isTunerOpen || isCascadeActive) return;
+    const rect = rigFrame.getBoundingClientRect();
+    const relX = e.clientX - rect.left;
+    const relY = e.clientY - rect.top;
+
+    // Petting is registered over the upper 42% of the pony's head/mane
+    if (relY > rect.height * 0.42 || relX < 0 || relX > rect.width) {
+      patReversals = 0;
+      return;
+    }
+
+    const now = performance.now();
+    patHistory.push({ x: relX, t: now });
+    patHistory = patHistory.filter((p) => now - p.t < 1200);
+
+    if (patHistory.length >= 3) {
+      const prev = patHistory[patHistory.length - 2];
+      const dx = relX - prev.x;
+      const dir = dx > 2 ? 1 : (dx < -2 ? -1 : 0);
+
+      if (dir !== 0 && dir !== lastDirection) {
+        patReversals++;
+        lastDirection = dir;
+        if (patReversals === 1) patStartTime = now;
+
+        if (patReversals >= 3) {
+          const duration = now - patStartTime;
+          soundFX.playPettingChime();
+
+          if (duration > 2000) {
+            triggerPonyReaction('shy'); // Sustained petting triggers shy blush!
+          } else {
+            triggerPonyReaction('happy');
+          }
+
+          spawnPettingHeart(relX, relY);
+          patReversals = 1; // keep chaining
+        }
+      }
+    }
+  });
+
+  function spawnPettingHeart(x, y) {
+    const heart = document.createElement('div');
+    heart.className = 'petting-heart';
+    heart.style.left = `${x}px`;
+    heart.style.top = `${y}px`;
+
+    const dx = (Math.random() - 0.5) * 50;
+    heart.style.setProperty('--dx', `${dx}px`);
+
+    const colors = ['#FF4081', '#FF80AB', '#FFD54F', '#FFF9A6', '#00E5FF'];
+    const col = colors[Math.floor(Math.random() * colors.length)];
+    const sz = 16 + Math.random() * 12;
+
+    heart.innerHTML = `
+      <svg width="${sz}" height="${sz}" viewBox="0 0 24 24">
+        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="${col}"/>
+      </svg>
+    `;
+    headpatContainer.appendChild(heart);
+    setTimeout(() => heart.remove(), 1200);
+  }
+
+  // Double-Click Y2K Speech Bubble
+  stickerSurface.addEventListener('dblclick', (e) => {
+    e.stopPropagation();
+    const char = MANE_6_CHARACTERS[currentCharacterId] || MANE_6_CHARACTERS.pinkie;
+    const quotes = char.quotes || ['Friendship is magic! ✨'];
+    const quote = quotes[Math.floor(Math.random() * quotes.length)];
+
+    speechBubbleText.textContent = quote;
+    speechBubble.style.display = 'block';
+    soundFX.playStickerPop();
+    triggerPonyReaction('happy');
+
+    clearTimeout(speechBubbleTimeout);
+    speechBubbleTimeout = setTimeout(() => {
+      speechBubble.style.display = 'none';
+    }, 4000);
+  });
+
+  /* ==========================================================================
+     9. Task 3: Visual Eye Rig Tuner (Ctrl + E)
+     ========================================================================== */
+
+  const eyeRigTuner = document.getElementById('eye-rig-tuner');
+  const btnTunerClose = document.getElementById('btn-tuner-close');
+  const tunerCharSelect = document.getElementById('tuner-char-select');
+  const tunerPoseSelect = document.getElementById('tuner-pose-select');
+  const inputLeftCx = document.getElementById('input-left-cx');
+  const inputLeftCy = document.getElementById('input-left-cy');
+  const inputLeftRx = document.getElementById('input-left-rx');
+  const inputLeftRy = document.getElementById('input-left-ry');
+  const inputLeftRot = document.getElementById('input-left-rot');
+  const chkLeftHide = document.getElementById('chk-left-hide');
+  const inputRightCx = document.getElementById('input-right-cx');
+  const inputRightCy = document.getElementById('input-right-cy');
+  const inputRightRx = document.getElementById('input-right-rx');
+  const inputRightRy = document.getElementById('input-right-ry');
+  const inputRightRot = document.getElementById('input-right-rot');
+  const chkRightHide = document.getElementById('chk-right-hide');
+  const inputCoatColor = document.getElementById('input-coat-color');
+  const textCoatColor = document.getElementById('text-coat-color');
+  const inputPoseScale = document.getElementById('input-pose-scale');
+  const inputPoseOffset = document.getElementById('input-pose-offset');
+  const btnTunerCopy = document.getElementById('btn-tuner-copy');
+  const tunerToast = document.getElementById('tuner-toast');
+
+  let isTunerOpen = false;
+  let isDraggingEye = null;
+
+  function initTunerControls() {
+    // Populate Char select
+    tunerCharSelect.innerHTML = '';
+    Object.keys(MANE_6_CHARACTERS).forEach((k) => {
+      const opt = document.createElement('option');
+      opt.value = k;
+      opt.textContent = MANE_6_CHARACTERS[k].name;
+      tunerCharSelect.appendChild(opt);
+    });
+
+    tunerCharSelect.addEventListener('change', () => {
+      switchMainCharacter(tunerCharSelect.value);
+      updateTunerPoseOptions();
+      syncTunerWithActivePose();
+    });
+
+    tunerPoseSelect.addEventListener('change', () => {
+      currentPoseIndex = parseInt(tunerPoseSelect.value, 10);
+      applyActivePose(true);
+      syncTunerWithActivePose();
+    });
+
+    // Wire Eye Rig Inputs
+    const wireInput = (el, valSpan, propPath) => {
+      el.addEventListener('input', () => {
+        if (valSpan) valSpan.textContent = el.type === 'range' && el.id.includes('rot') ? `${el.value}°` : el.value;
+        const pose = getCurrentPose();
+        if (!pose || !pose.eyeRig) return;
+        setDeepProp(pose.eyeRig, propPath, el.type === 'checkbox' ? el.checked : parseFloat(el.value));
+        updateEyeRigUI(pose.eyeRig);
+      });
+    };
+
+    wireInput(inputLeftCx, document.getElementById('val-left-cx'), 'leftEye.cx');
+    wireInput(inputLeftCy, document.getElementById('val-left-cy'), 'leftEye.cy');
+    wireInput(inputLeftRx, document.getElementById('val-left-rx'), 'leftEye.rx');
+    wireInput(inputLeftRy, document.getElementById('val-left-ry'), 'leftEye.ry');
+    wireInput(inputLeftRot, document.getElementById('val-left-rot'), 'leftEye.rot');
+    wireInput(chkLeftHide, null, 'leftEye.hidden');
+
+    wireInput(inputRightCx, document.getElementById('val-right-cx'), 'rightEye.cx');
+    wireInput(inputRightCy, document.getElementById('val-right-cy'), 'rightEye.cy');
+    wireInput(inputRightRx, document.getElementById('val-right-rx'), 'rightEye.rx');
+    wireInput(inputRightRy, document.getElementById('val-right-ry'), 'rightEye.ry');
+    wireInput(inputRightRot, document.getElementById('val-right-rot'), 'rightEye.rot');
+    wireInput(chkRightHide, null, 'rightEye.hidden');
+
+    // Coat color
+    inputCoatColor.addEventListener('input', () => {
+      textCoatColor.value = inputCoatColor.value;
+      const pose = getCurrentPose();
+      if (pose) pose.coatColor = inputCoatColor.value;
+      document.documentElement.style.setProperty('--character-coat-color', inputCoatColor.value);
+    });
+    textCoatColor.addEventListener('change', () => {
+      inputCoatColor.value = textCoatColor.value;
+      const pose = getCurrentPose();
+      if (pose) pose.coatColor = textCoatColor.value;
+      document.documentElement.style.setProperty('--character-coat-color', textCoatColor.value);
+    });
+
+    // Scale & Offset (applied to rigFrame so face rig & stickers remain locked 1:1)
+    inputPoseScale.addEventListener('input', () => {
+      document.getElementById('val-pose-scale').textContent = inputPoseScale.value;
+      const pose = getCurrentPose();
+      if (!pose) return;
+      pose.scale = parseFloat(inputPoseScale.value);
+      rigFrame.style.transform = `translateY(${pose.offsetY || 0}px) scale(${pose.scale || 1.0})`;
+    });
+
+    inputPoseOffset.addEventListener('input', () => {
+      document.getElementById('val-pose-offset').textContent = `${inputPoseOffset.value}px`;
+      const pose = getCurrentPose();
+      if (!pose) return;
+      pose.offsetY = parseFloat(inputPoseOffset.value);
+      rigFrame.style.transform = `translateY(${pose.offsetY || 0}px) scale(${pose.scale || 1.0})`;
+    });
+
+    // Copy JSON Config button with fallback for file:// contexts
+    btnTunerCopy.addEventListener('pointerdown', (e) => {
+      e.stopPropagation();
+      const pose = getCurrentPose();
+      if (!pose) return;
+      const jsonStr = JSON.stringify(pose, null, 2);
+      const copyFallback = () => {
+        const ta = document.createElement('textarea');
+        ta.value = jsonStr;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); } catch (err) {}
+        ta.remove();
+        showTunerToast();
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(jsonStr).then(showTunerToast).catch(copyFallback);
+      } else {
+        copyFallback();
+      }
+    });
+
+    btnTunerClose.addEventListener('pointerdown', (e) => {
+      e.stopPropagation();
+      toggleEyeRigTuner(false);
+    });
+
+    makeElementDraggable(eyeRigTuner, document.getElementById('eye-rig-tuner-titlebar'));
+  }
+
+  function setDeepProp(obj, path, val) {
+    const parts = path.split('.');
+    let cur = obj;
+    for (let i = 0; i < parts.length - 1; i++) {
+      if (!cur[parts[i]]) cur[parts[i]] = {};
+      cur = cur[parts[i]];
+    }
+    cur[parts[parts.length - 1]] = val;
+  }
+
+  function updateTunerPoseOptions() {
+    const char = MANE_6_CHARACTERS[currentCharacterId];
+    tunerPoseSelect.innerHTML = '';
+    if (!char || !char.poses) return;
+    char.poses.forEach((p, idx) => {
+      const opt = document.createElement('option');
+      opt.value = idx.toString();
+      opt.textContent = `${idx + 1}. ${p.label}`;
+      tunerPoseSelect.appendChild(opt);
+    });
+  }
+
+  function syncTunerWithActivePose() {
+    tunerCharSelect.value = currentCharacterId;
+    tunerPoseSelect.value = currentPoseIndex.toString();
+    const pose = getCurrentPose();
+    if (!pose || !pose.eyeRig) return;
+
+    const l = pose.eyeRig.leftEye || {};
+    const r = pose.eyeRig.rightEye || {};
+
+    inputLeftCx.value = l.cx || 30;
+    document.getElementById('val-left-cx').textContent = l.cx || 30;
+    inputLeftCy.value = l.cy || 48;
+    document.getElementById('val-left-cy').textContent = l.cy || 48;
+    inputLeftRx.value = l.rx || 9.5;
+    document.getElementById('val-left-rx').textContent = l.rx || 9.5;
+    inputLeftRy.value = l.ry || 10.2;
+    document.getElementById('val-left-ry').textContent = l.ry || 10.2;
+    inputLeftRot.value = l.rot || 0;
+    document.getElementById('val-left-rot').textContent = `${l.rot || 0}°`;
+    chkLeftHide.checked = Boolean(l.hidden);
+
+    inputRightCx.value = r.cx || 65;
+    document.getElementById('val-right-cx').textContent = r.cx || 65;
+    inputRightCy.value = r.cy || 48;
+    document.getElementById('val-right-cy').textContent = r.cy || 48;
+    inputRightRx.value = r.rx || 9.5;
+    document.getElementById('val-right-rx').textContent = r.rx || 9.5;
+    inputRightRy.value = r.ry || 10.2;
+    document.getElementById('val-right-ry').textContent = r.ry || 10.2;
+    inputRightRot.value = r.rot || 0;
+    document.getElementById('val-right-rot').textContent = `${r.rot || 0}°`;
+    chkRightHide.checked = Boolean(r.hidden);
+
+    inputCoatColor.value = pose.coatColor || '#F6B2D1';
+    textCoatColor.value = pose.coatColor || '#F6B2D1';
+    inputPoseScale.value = pose.scale || 1.0;
+    document.getElementById('val-pose-scale').textContent = pose.scale || 1.0;
+    inputPoseOffset.value = pose.offsetY || 0;
+    document.getElementById('val-pose-offset').textContent = `${pose.offsetY || 0}px`;
+  }
+
+  function showTunerToast() {
+    tunerToast.classList.add('show');
+    setTimeout(() => tunerToast.classList.remove('show'), 2200);
+  }
+
+  function toggleEyeRigTuner(force = null) {
+    isTunerOpen = force !== null ? force : !isTunerOpen;
+    eyeRigTuner.style.display = isTunerOpen ? 'block' : 'none';
+    document.body.classList.toggle('tuner-mode-active', isTunerOpen);
+    if (isTunerOpen) {
+      updateTunerPoseOptions();
+      syncTunerWithActivePose();
+    }
+  }
+
+  // On-screen direct dragging of eye groups in Tuner Mode
+  [
+    { el: rigEyeLeftGroup, which: 'left' },
+    { el: rigEyeRightGroup, which: 'right' }
+  ].forEach(({ el, which }) => {
+    el.addEventListener('pointerdown', (e) => {
+      if (!isTunerOpen) return;
+      e.stopPropagation();
+      isDraggingEye = which;
+
+      const onMove = (ev) => {
+        if (!isDraggingEye) return;
+        const rect = rigFrame.getBoundingClientRect();
+        const pctX = Math.round(((ev.clientX - rect.left) / rect.width) * 1000) / 10;
+        const pctY = Math.round(((ev.clientY - rect.top) / rect.height) * 1000) / 10;
+        const pose = getCurrentPose();
+        if (!pose || !pose.eyeRig) return;
+
+        if (isDraggingEye === 'left') {
+          pose.eyeRig.leftEye.cx = pctX;
+          pose.eyeRig.leftEye.cy = pctY;
+          inputLeftCx.value = pctX;
+          document.getElementById('val-left-cx').textContent = pctX;
+          inputLeftCy.value = pctY;
+          document.getElementById('val-left-cy').textContent = pctY;
+        } else {
+          pose.eyeRig.rightEye.cx = pctX;
+          pose.eyeRig.rightEye.cy = pctY;
+          inputRightCx.value = pctX;
+          document.getElementById('val-right-cx').textContent = pctX;
+          inputRightCy.value = pctY;
+          document.getElementById('val-right-cy').textContent = pctY;
+        }
+        updateEyeRigUI(pose.eyeRig);
+      };
+
+      const onUp = () => {
+        isDraggingEye = null;
+        window.removeEventListener('pointermove', onMove);
+        window.removeEventListener('pointerup', onUp);
+      };
+
+      window.addEventListener('pointermove', onMove);
+      window.addEventListener('pointerup', onUp);
+    });
+  });
+
+  // Ctrl + E to toggle Tuner
+  window.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && (e.key === 'e' || e.key === 'E')) {
+      e.preventDefault();
+      toggleEyeRigTuner();
+    }
+  });
+
+  /* ==========================================================================
+     10. Milestone 3: Elements of Harmony & Party Cannon Reset
+     ========================================================================== */
+
   function triggerElementsOfHarmonyCombo() {
     soundFX.playHarmonyChord();
     triggerPonyReaction('starry');
@@ -886,7 +1968,6 @@
     triggerCelebrationBurst();
   }
 
-  /** Milestone 3: Party Cannon Reset with Parabolic Physics Flight */
   function triggerPartyCannonReset() {
     soundFX.playCannonBoom();
 
@@ -942,7 +2023,7 @@
   }
 
   /* ==========================================================================
-     8. Milestone 2: Retro Windows 95/98 Pop-up Cascades & Drag Controller
+     11. Milestone 2: Retro Pop-up Window Cascade
      ========================================================================== */
 
   const windowOverlay = document.getElementById('window-overlay');
@@ -950,46 +2031,11 @@
   let highestZIndex = 510;
 
   const MANE_6_CAMEOS = [
-    {
-      id: 'twilight',
-      name: 'Twilight Sparkle',
-      icon: '🔮',
-      title: '🔮 · Twilight_Library.sys',
-      themeClass: 'titlebar-twilight',
-      file: 'assets/twilight.png'
-    },
-    {
-      id: 'rainbow',
-      name: 'Rainbow Dash',
-      icon: '⚡',
-      title: '⚡ · Sonic_Rainboom.avi',
-      themeClass: 'titlebar-rainbow',
-      file: 'assets/rainbow.png'
-    },
-    {
-      id: 'fluttershy',
-      name: 'Fluttershy',
-      icon: '🌸',
-      title: '🌸 · Kindness_Vibes.exe',
-      themeClass: 'titlebar-fluttershy',
-      file: 'assets/fluttershy.png'
-    },
-    {
-      id: 'rarity',
-      name: 'Rarity',
-      icon: '💎',
-      title: '💎 · Fabulous_Design.exe',
-      themeClass: 'titlebar-rarity',
-      file: 'assets/rarity.png'
-    },
-    {
-      id: 'applejack',
-      name: 'Applejack',
-      icon: '🍎',
-      title: '🍎 · Sweet_Apple_Acres.bat',
-      themeClass: 'titlebar-applejack',
-      file: 'assets/applejack.png'
-    }
+    { id: 'twilight', name: 'Twilight Sparkle', icon: '🔮', title: '🔮 · Twilight_Library.sys', themeClass: 'titlebar-twilight', file: 'assets/poses/twilight-pose1.png' },
+    { id: 'rainbow', name: 'Rainbow Dash', icon: '⚡', title: '⚡ · Sonic_Rainboom.avi', themeClass: 'titlebar-rainbow', file: 'assets/poses/rainbow-pose1.png' },
+    { id: 'fluttershy', name: 'Fluttershy', icon: '🌸', title: '🌸 · Kindness_Vibes.exe', themeClass: 'titlebar-fluttershy', file: 'assets/poses/fluttershy-pose1.png' },
+    { id: 'rarity', name: 'Rarity', icon: '💎', title: '💎 · Fabulous_Design.exe', themeClass: 'titlebar-rarity', file: 'assets/poses/rarity-pose1.png' },
+    { id: 'applejack', name: 'Applejack', icon: '🍎', title: '🍎 · Sweet_Apple_Acres.bat', themeClass: 'titlebar-applejack', file: 'assets/poses/applejack-pose1.png' }
   ];
 
   function triggerRetroWindowCascade() {
@@ -1048,7 +2094,7 @@
       winBody.className = 'retro-window-body';
       const img = document.createElement('img');
       img.className = 'popup-pinkie-closeup';
-      img.src = 'assets/pinkie-idle.png';
+      img.src = 'assets/poses/pinkie-pose1.png';
       img.alt = 'Pinkie Pie Face';
       winBody.appendChild(img);
 
@@ -1101,13 +2147,13 @@
     return win;
   }
 
-  function makeElementDraggable(win, handle) {
+  function makeElementDraggable(win, handle, onSave = null) {
     let isDragging = false;
     let startX = 0, startY = 0;
     let initLeft = 0, initTop = 0;
 
     const onPointerDown = (e) => {
-      if (e.target.closest('button') || e.target.closest('input')) return;
+      if (e.target.closest('button') || e.target.closest('input') || e.target.closest('select')) return;
       isDragging = true;
       win.classList.add('is-dragging');
       highestZIndex++;
@@ -1121,6 +2167,8 @@
 
       win.style.left = `${initLeft}px`;
       win.style.top = `${initTop}px`;
+      win.style.right = 'auto';
+      win.style.bottom = 'auto';
 
       window.addEventListener('pointermove', onPointerMove);
       window.addEventListener('pointerup', onPointerUp);
@@ -1149,6 +2197,7 @@
       win.classList.remove('is-dragging');
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerup', onPointerUp);
+      if (onSave) onSave({ left: parseInt(win.style.left, 10), top: parseInt(win.style.top, 10) });
     };
 
     handle.addEventListener('pointerdown', onPointerDown);
@@ -1175,7 +2224,7 @@
   }
 
   /* ==========================================================================
-     9. Milestone 2: Real-Time Audio Visualizer (Winamp Style)
+     12. Milestone 2: Real-Time Audio Visualizer (Winamp Style)
      ========================================================================== */
 
   const winampVisualizer = document.getElementById('winamp-visualizer');
@@ -1210,7 +2259,6 @@
 
   makeElementDraggable(winampVisualizer, document.getElementById('winamp-titlebar'));
 
-  // Native Lively Wallpaper Audio Listener (128 Frequency Bands)
   window.livelyAudioListener = function (audioArray) {
     if (audioArray && audioArray.length > 0) {
       lastAudioTick = performance.now();
@@ -1228,9 +2276,8 @@
     for (let i = 0; i < bassBins; i++) {
       bassSum += audioSpectrumData[i] || 0;
     }
-    const bassAvg = bassSum / bassBins; // 0.0 to 1.0
+    const bassAvg = bassSum / bassBins;
 
-    // Drive Character Bounce & Scale
     const bounceY = -bassAvg * 18;
     const scaleAmp = 1 + bassAvg * 0.08;
     const glowAmp = bassAvg * 16;
@@ -1247,7 +2294,6 @@
     const h = winampCanvas.height;
     winampCtx.clearRect(0, 0, w, h);
 
-    // If simulation mode or idle without active Lively audio
     const now = performance.now();
     if (isSimulatingAudio || (now - lastAudioTick > 2000 && !isPaused)) {
       for (let i = 0; i < audioSpectrumData.length; i++) {
@@ -1268,7 +2314,6 @@
       const x = i * (barWidth + 2) + 2;
       const y = h - barHeight;
 
-      // Classic Winamp LED Segment Gradient: Green -> Yellow -> Red
       const grad = winampCtx.createLinearGradient(0, h, 0, 0);
       grad.addColorStop(0.0, '#00FF66');
       grad.addColorStop(0.6, '#FFFF00');
@@ -1280,7 +2325,7 @@
   }
 
   /* ==========================================================================
-     10. Milestone 2: Live Hardware Monitor (Ponyville_TaskMgr.exe)
+     13. Milestone 2: Live Hardware Monitor (Ponyville_TaskMgr.exe)
      ========================================================================== */
 
   const taskmgrWindow = document.getElementById('taskmgr-window');
@@ -1294,8 +2339,29 @@
   const taskmgrRamFill = document.getElementById('taskmgr-ram-fill');
   const taskmgrGpuVal = document.getElementById('taskmgr-gpu-val');
   const taskmgrGpuFill = document.getElementById('taskmgr-gpu-fill');
+  const tabTaskmgrPerf = document.getElementById('tab-taskmgr-perf');
+  const tabTaskmgrPonies = document.getElementById('tab-taskmgr-ponies');
+  const taskmgrContent = document.getElementById('taskmgr-content');
+  const taskmgrPoniesView = document.getElementById('taskmgr-ponies-view');
 
   const cpuHistory = new Array(36).fill(12);
+
+  if (tabTaskmgrPerf && tabTaskmgrPonies && taskmgrContent && taskmgrPoniesView) {
+    tabTaskmgrPerf.addEventListener('pointerdown', (e) => {
+      e.stopPropagation();
+      tabTaskmgrPerf.classList.add('active');
+      tabTaskmgrPonies.classList.remove('active');
+      taskmgrContent.style.display = 'flex';
+      taskmgrPoniesView.style.display = 'none';
+    });
+    tabTaskmgrPonies.addEventListener('pointerdown', (e) => {
+      e.stopPropagation();
+      tabTaskmgrPonies.classList.add('active');
+      tabTaskmgrPerf.classList.remove('active');
+      taskmgrPoniesView.style.display = 'flex';
+      taskmgrContent.style.display = 'none';
+    });
+  }
 
   btnTaskmgrToggle.addEventListener('pointerdown', (e) => {
     e.stopPropagation();
@@ -1316,7 +2382,6 @@
 
   makeElementDraggable(taskmgrWindow, taskmgrTitlebar);
 
-  // Native Lively Hardware Information Listener
   window.livelySystemInformation = function (data) {
     if (!data) return;
     let parsed = data;
@@ -1353,7 +2418,6 @@
     taskmgrCpuCtx.fillStyle = '#000000';
     taskmgrCpuCtx.fillRect(0, 0, w, h);
 
-    // Green CRT oscilloscope grid
     taskmgrCpuCtx.strokeStyle = 'rgba(0, 150, 0, 0.35)';
     taskmgrCpuCtx.lineWidth = 1;
     for (let x = 0; x < w; x += 20) {
@@ -1369,7 +2433,6 @@
       taskmgrCpuCtx.stroke();
     }
 
-    // Oscilloscope CPU trace
     taskmgrCpuCtx.strokeStyle = '#00FF66';
     taskmgrCpuCtx.lineWidth = 2;
     taskmgrCpuCtx.beginPath();
@@ -1383,7 +2446,6 @@
     taskmgrCpuCtx.stroke();
   }
 
-  // Standalone simulated hardware metrics ticker
   setInterval(() => {
     if (isPaused) return;
     const simCpu = Math.max(5, Math.min(95, Math.round(15 + Math.random() * 25 + Math.sin(Date.now() * 0.001) * 10)));
@@ -1393,7 +2455,7 @@
   }, 1000);
 
   /* ==========================================================================
-     11. Milestone 4: Daily Y2K Productivity Widgets (Clock & To-Do)
+     14. Milestone 4: Daily Y2K Productivity Widgets (Clock & To-Do)
      ========================================================================== */
 
   const widgetClock = document.getElementById('widget-clock');
@@ -1429,7 +2491,7 @@
   makeElementDraggable(widgetClock, document.getElementById('widget-clock-titlebar'));
   makeElementDraggable(widgetTodo, document.getElementById('widget-todo-titlebar'));
 
-  // Clock & Calendar Logic
+  // Clock
   const clockDigitalTime = document.getElementById('clock-digital-time');
   const clockDigitalDate = document.getElementById('clock-digital-date');
   const miniCalendarBody = document.getElementById('mini-calendar-body');
@@ -1479,7 +2541,7 @@
   renderMiniCalendar();
   setInterval(updateClockDisplay, 1000);
 
-  // Persistent To-Do List
+  // To-Do List
   const todoForm = document.getElementById('todo-form');
   const todoInput = document.getElementById('todo-input');
   const todoList = document.getElementById('todo-list');
@@ -1497,7 +2559,7 @@
   if (todos.length === 0) {
     todos = [
       { id: 1, text: 'Bake cupcakes for Pinkie', done: true },
-      { id: 2, text: 'Organize library with Twilight', done: false }
+      { id: 2, text: 'Study friendship books with Twilight', done: false }
     ];
   }
 
@@ -1548,11 +2610,7 @@
     e.preventDefault();
     const val = todoInput.value.trim();
     if (!val) return;
-    todos.push({
-      id: Date.now(),
-      text: val,
-      done: false
-    });
+    todos.push({ id: Date.now(), text: val, done: false });
     todoInput.value = '';
     saveAndRenderTodos();
   });
@@ -1566,13 +2624,72 @@
   saveAndRenderTodos();
 
   /* ==========================================================================
-     12. Milestone 4: Mode Toggle (Party Mode vs Chill Mode)
+     15. Task 4: Taskbar-Safe, Draggable & Collapsible Control Dock
      ========================================================================== */
 
+  const wallpaperControls = document.getElementById('wallpaper-controls');
+  const dockDragHandle = document.getElementById('dock-drag-handle');
+  const btnDockCollapse = document.getElementById('btn-dock-collapse');
+  const btnPoseSwitch = document.getElementById('btn-pose-switch');
   const btnModeToggle = document.getElementById('btn-mode-toggle');
   const iconModeParty = document.getElementById('icon-mode-party');
   const iconModeChill = document.getElementById('icon-mode-chill');
+  const btnPartyGuest = document.getElementById('btn-party-guest');
+  const btnSoundToggle = document.getElementById('btn-sound-toggle');
+  const iconSoundOn = document.getElementById('icon-sound-on');
+  const iconSoundOff = document.getElementById('icon-sound-off');
+  const btnManualReset = document.getElementById('btn-manual-reset');
 
+  // Restore saved dock position
+  try {
+    const savedPos = localStorage.getItem('pony_dock_position');
+    if (savedPos) {
+      const pos = JSON.parse(savedPos);
+      if (pos && typeof pos.left === 'number' && typeof pos.top === 'number') {
+        const safeLeft = Math.max(5, Math.min(window.innerWidth - 120, pos.left));
+        const safeTop = Math.max(5, Math.min(window.innerHeight - 60, pos.top));
+        wallpaperControls.style.left = `${safeLeft}px`;
+        wallpaperControls.style.top = `${safeTop}px`;
+        wallpaperControls.style.right = 'auto';
+        wallpaperControls.style.bottom = 'auto';
+      }
+    }
+  } catch (e) {}
+
+  // Dragging dock
+  makeElementDraggable(wallpaperControls, dockDragHandle, (pos) => {
+    localStorage.setItem('pony_dock_position', JSON.stringify(pos));
+  });
+
+  // Double-click on drag handle resets to default position (bottom: 76px; right: 24px)
+  dockDragHandle.addEventListener('dblclick', (e) => {
+    e.stopPropagation();
+    localStorage.removeItem('pony_dock_position');
+    wallpaperControls.style.left = 'auto';
+    wallpaperControls.style.top = 'auto';
+    wallpaperControls.style.right = '24px';
+    wallpaperControls.style.bottom = '76px';
+  });
+
+  // Collapsible dock toggle
+  const savedCollapsed = localStorage.getItem('pony_dock_collapsed') === 'true';
+  if (savedCollapsed) {
+    wallpaperControls.classList.add('is-collapsed');
+  }
+
+  btnDockCollapse.addEventListener('pointerdown', (e) => {
+    e.stopPropagation();
+    const isNowCollapsed = wallpaperControls.classList.toggle('is-collapsed');
+    localStorage.setItem('pony_dock_collapsed', isNowCollapsed.toString());
+  });
+
+  // Pose Switcher Button
+  btnPoseSwitch.addEventListener('pointerdown', (e) => {
+    e.stopPropagation();
+    cycleCharacterPose();
+  });
+
+  // Mode Toggle (Party vs Chill Mode)
   function updateModeUI() {
     document.body.classList.toggle('chill-mode', isChillMode);
     if (isChillMode) {
@@ -1594,8 +2711,83 @@
 
   updateModeUI();
 
+  // Sound Mute Toggle
+  function updateMuteIcons(muted) {
+    if (muted) {
+      iconSoundOn.style.display = 'none';
+      iconSoundOff.style.display = 'block';
+    } else {
+      iconSoundOn.style.display = 'block';
+      iconSoundOff.style.display = 'none';
+    }
+  }
+
+  updateMuteIcons(soundFX.isMuted);
+
+  btnSoundToggle.addEventListener('pointerdown', (e) => {
+    e.stopPropagation();
+    soundFX.init();
+    const muted = soundFX.toggleMute();
+    updateMuteIcons(muted);
+    if (!muted) soundFX.playStickerPop();
+  });
+
+  // Party Guest Button
+  btnPartyGuest.addEventListener('pointerdown', (e) => {
+    e.stopPropagation();
+    soundFX.init();
+    triggerPonyReaction();
+    triggerRandomSignatureEffect();
+
+    const safeLeft = 20 + Math.random() * 45;
+    const safeTop = 16 + Math.random() * 35;
+    const win = createRetroWindow('cameo', safeLeft, safeTop);
+    windowOverlay.appendChild(win);
+    openWindows.push(win);
+    soundFX.playWindowSpawn();
+    requestAnimationFrame(() => win.classList.add('is-open'));
+  });
+
+  // Manual Reset Button
+  btnManualReset.addEventListener('pointerdown', (e) => {
+    e.stopPropagation();
+    soundFX.init();
+    openWindows.forEach((w) => w.remove());
+    openWindows = [];
+    triggerPartyCannonReset();
+  });
+
+  // Mane 6 Dock Buttons
+  const dockButtons = document.querySelectorAll('.pony-dock-btn');
+  dockButtons.forEach((btn) => {
+    btn.addEventListener('pointerdown', (e) => {
+      e.stopPropagation();
+      soundFX.init();
+      const ponyId = btn.dataset.pony;
+      if (ponyId) switchMainCharacter(ponyId);
+    });
+  });
+
+  // Keyboard accessibility
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (isTunerOpen) {
+        toggleEyeRigTuner(false);
+      } else if (openWindows.length > 0) {
+        closeRetroWindow(openWindows[openWindows.length - 1]);
+      } else if (taskmgrWindow.style.display !== 'none') {
+        taskmgrWindow.style.display = 'none';
+        btnTaskmgrToggle.classList.remove('active');
+      } else if (widgetClock.style.display !== 'none' || widgetTodo.style.display !== 'none') {
+        widgetClock.style.display = 'none';
+        widgetTodo.style.display = 'none';
+        btnWidgetsToggle.classList.remove('active');
+      }
+    }
+  });
+
   /* ==========================================================================
-     13. Milestone 3: Mane 6 Fullscreen Signature Screen Effects
+     16. Milestone 3: Fullscreen Signature Screen Effects
      ========================================================================== */
 
   const signatureEffectsContainer = document.getElementById('signature-effects-container');
@@ -1782,7 +2974,7 @@
   }
 
   /* ==========================================================================
-     14. Milestone 2: Lively Wallpaper Native Property Integration
+     17. Milestone 2: Lively Wallpaper Native Property Integration
      ========================================================================== */
 
   window.livelyPropertyListener = function (name, val) {
@@ -1808,7 +3000,7 @@
 
     } else if (name === 'starDensity') {
       starDensity = Math.max(10, Math.min(120, parseInt(val, 10) || 42));
-      initStars();
+      initAmbientParticles();
 
     } else if (name === 'muteAudio') {
       if (soundFX.isMuted !== Boolean(val)) {
@@ -1819,92 +3011,11 @@
   };
 
   /* ==========================================================================
-     15. Controls & Keyboard Accessibility
-     ========================================================================== */
-
-  const btnPartyGuest = document.getElementById('btn-party-guest');
-  const btnSoundToggle = document.getElementById('btn-sound-toggle');
-  const iconSoundOn = document.getElementById('icon-sound-on');
-  const iconSoundOff = document.getElementById('icon-sound-off');
-  const btnManualReset = document.getElementById('btn-manual-reset');
-
-  function updateMuteIcons(muted) {
-    if (muted) {
-      iconSoundOn.style.display = 'none';
-      iconSoundOff.style.display = 'block';
-    } else {
-      iconSoundOn.style.display = 'block';
-      iconSoundOff.style.display = 'none';
-    }
-  }
-
-  updateMuteIcons(soundFX.isMuted);
-
-  btnPartyGuest.addEventListener('pointerdown', (e) => {
-    e.stopPropagation();
-    soundFX.init();
-    triggerPonyReaction();
-    triggerRandomSignatureEffect();
-
-    const safeLeft = 20 + Math.random() * 45;
-    const safeTop = 16 + Math.random() * 35;
-    const win = createRetroWindow('cameo', safeLeft, safeTop);
-    windowOverlay.appendChild(win);
-    openWindows.push(win);
-    soundFX.playWindowSpawn();
-    requestAnimationFrame(() => win.classList.add('is-open'));
-  });
-
-  btnSoundToggle.addEventListener('pointerdown', (e) => {
-    e.stopPropagation();
-    soundFX.init();
-    const muted = soundFX.toggleMute();
-    updateMuteIcons(muted);
-    if (!muted) soundFX.playStickerPop();
-  });
-
-  btnManualReset.addEventListener('pointerdown', (e) => {
-    e.stopPropagation();
-    soundFX.init();
-    openWindows.forEach((w) => w.remove());
-    openWindows = [];
-    triggerPartyCannonReset();
-  });
-
-  // Mane 6 Dock Buttons
-  const dockButtons = document.querySelectorAll('.pony-dock-btn');
-  dockButtons.forEach((btn) => {
-    btn.addEventListener('pointerdown', (e) => {
-      e.stopPropagation();
-      soundFX.init();
-      const ponyId = btn.dataset.pony;
-      if (ponyId) switchMainCharacter(ponyId);
-    });
-  });
-
-  // Keyboard accessibility: Escape closes topmost window
-  window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      if (openWindows.length > 0) {
-        closeRetroWindow(openWindows[openWindows.length - 1]);
-      } else if (taskmgrWindow.style.display !== 'none') {
-        taskmgrWindow.style.display = 'none';
-        btnTaskmgrToggle.classList.remove('active');
-      } else if (widgetClock.style.display !== 'none' || widgetTodo.style.display !== 'none') {
-        widgetClock.style.display = 'none';
-        widgetTodo.style.display = 'none';
-        btnWidgetsToggle.classList.remove('active');
-      }
-    }
-  });
-
-  /* ==========================================================================
-     16. Main RAF Render Loop (Parallax Lerp, Starfield & Winamp Visualizer)
+     18. Main RAF Render Loop
      ========================================================================== */
 
   function renderLoop() {
     if (!isPaused) {
-      // 3D Parallax & Cursor Gaze Tracking Lerp
       currentParallaxX += (targetParallaxX - currentParallaxX) * 0.08;
       currentParallaxY += (targetParallaxY - currentParallaxY) * 0.08;
 
@@ -1914,22 +3025,22 @@
       document.documentElement.style.setProperty('--parallax-ribbon-y', `${-currentParallaxY * 8}px`);
       document.documentElement.style.setProperty('--parallax-char-x', `${currentParallaxX * 18}px`);
       document.documentElement.style.setProperty('--parallax-char-y', `${currentParallaxY * 12}px`);
-      document.documentElement.style.setProperty('--parallax-eye-x', `${currentParallaxX * 9}px`);
-      document.documentElement.style.setProperty('--parallax-eye-y', `${currentParallaxY * 7}px`);
 
-      // Render Offscreen Starfield
-      renderStars();
+      // Ambient Theme Particles
+      renderAmbientParticles();
 
-      // Render Winamp Equalizer
+      // Winamp Equalizer
       renderWinampEQ();
     }
     animFrameId = requestAnimationFrame(renderLoop);
   }
 
   // Startup Initialization
-  preRenderStarCache();
+  preRenderParticleSprites();
   window.addEventListener('resize', resizeStarCanvas);
   resizeStarCanvas();
+  applyActivePose(true);
+  initTunerControls();
   animFrameId = requestAnimationFrame(renderLoop);
 
 })();

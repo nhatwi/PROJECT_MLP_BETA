@@ -42,9 +42,9 @@
     <div class="harmony-banner">✨ Elements of Harmony Harmonized! ✨</div>
   </div>
 
-  <!-- LAYER 1: Dynamic Y2K Background Scene -->
+  <!-- LAYER 1: Dynamic Y2K Background Scene (Mane 6 Theme Morphing Particles) -->
   <div class="background-scene" id="bg-scene">
-    <!-- Drifting Y2K Starfield Background -->
+    <!-- Drifting Theme Particles & Starfield Canvas -->
     <canvas id="starfield-canvas" class="starfield-canvas"></canvas>
 
     <!-- Wavy Pastel Argyle Ribbon Band -->
@@ -68,15 +68,15 @@
           <div class="pinkie-rig-frame" id="pinkie-rig-frame">
             <img id="pinkie-idle-img"
                  class="pinkie-img pinkie-idle-state"
-                 src="assets/pinkie-idle.png"
+                 src="assets/poses/pinkie-pose1.png"
                  alt="Main Pony"
                  draggable="false">
 
-            <!-- Vector Face Rig -->
+            <!-- Refactored Relative Vector Face Rig (Locked 1:1 to Rig Frame) -->
             <svg id="pinkie-face-rig" class="pinkie-face-rig" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
               <defs>
                 <radialGradient id="cheekBlushGrad" cx="50%" cy="50%" r="50%">
-                  <stop offset="0%" stop-color="var(--character-blush-1, #FF4F93)" stop-opacity="0.6" />
+                  <stop offset="0%" stop-color="var(--character-blush-1, #FF4F93)" stop-opacity="0.65" />
                   <stop offset="65%" stop-color="var(--character-blush-2, #FF85B3)" stop-opacity="0.25" />
                   <stop offset="100%" stop-color="var(--character-blush-2, #FF85B3)" stop-opacity="0" />
                 </radialGradient>
@@ -88,28 +88,51 @@
                 <ellipse id="rig-blush-right" cx="69.5" cy="57.5" rx="6.8" ry="3.8" fill="url(#cheekBlushGrad)" />
               </g>
 
-              <!-- Left Eyelid -->
-              <g class="expr-eye-left" id="rig-eye-left-group">
-                <ellipse id="rig-eye-patch-left" cx="29.5" cy="48.5" rx="9.5" ry="10.2" class="coat-patch" />
-                <path id="rig-lash-left" d="M 21.5 50.5 Q 29.5 41.2 37.5 49.5" fill="none" stroke="#2B1422" stroke-width="1.6" stroke-linecap="round" />
-                <path d="M 22.5 48.5 L 19.2 46.0" stroke="#2B1422" stroke-width="1.3" stroke-linecap="round" />
-                <path d="M 26.5 45.2 L 25.0 42.0" stroke="#2B1422" stroke-width="1.3" stroke-linecap="round" />
+              <!-- Left Eyelid Group (Relative to (0,0) with translate(cx, cy) rotate(rot)) -->
+              <g class="expr-eye-left" id="rig-eye-left-group" transform="translate(29.5, 48.5) rotate(0)">
+                <ellipse id="rig-eye-patch-left" cx="0" cy="0" rx="9.5" ry="10.2" class="coat-patch" />
+                <path id="rig-lash-left" d="M -8.0 1.5 Q 0 -8.0 8.0 1.5" fill="none" stroke="#2B1422" stroke-width="1.6" stroke-linecap="round" />
+                <path id="rig-lash-left-acc1" d="M -6.5 -0.5 L -10.0 -3.5" stroke="#2B1422" stroke-width="1.3" stroke-linecap="round" />
+                <path id="rig-lash-left-acc2" d="M -3.5 -4.5 L -5.5 -8.0" stroke="#2B1422" stroke-width="1.3" stroke-linecap="round" />
+                <!-- Tuner Crosshair & Bounding Outline -->
+                <circle id="tuner-crosshair-left" class="tuner-crosshair" cx="0" cy="0" r="1.8" />
+                <rect id="tuner-bbox-left" class="tuner-bbox" x="-9.5" y="-10.2" width="19" height="20.4" />
               </g>
 
-              <!-- Right Eyelid -->
-              <g class="expr-eye-right" id="rig-eye-right-group">
-                <ellipse id="rig-eye-patch-right" cx="64.5" cy="48.5" rx="9.5" ry="10.2" class="coat-patch" />
-                <path id="rig-lash-right" d="M 56.5 49.5 Q 64.5 41.2 72.5 50.5" fill="none" stroke="#2B1422" stroke-width="1.6" stroke-linecap="round" />
-                <path d="M 71.5 48.5 L 74.8 46.0" stroke="#2B1422" stroke-width="1.3" stroke-linecap="round" />
-                <path d="M 67.5 45.2 L 69.0 42.0" stroke="#2B1422" stroke-width="1.3" stroke-linecap="round" />
+              <!-- Right Eyelid Group (Relative to (0,0) with translate(cx, cy) rotate(rot)) -->
+              <g class="expr-eye-right" id="rig-eye-right-group" transform="translate(64.5, 48.5) rotate(0)">
+                <ellipse id="rig-eye-patch-right" cx="0" cy="0" rx="9.5" ry="10.2" class="coat-patch" />
+                <path id="rig-lash-right" d="M -8.0 1.5 Q 0 -8.0 8.0 1.5" fill="none" stroke="#2B1422" stroke-width="1.6" stroke-linecap="round" />
+                <path id="rig-lash-right-acc1" d="M 6.5 -0.5 L 10.0 -3.5" stroke="#2B1422" stroke-width="1.3" stroke-linecap="round" />
+                <path id="rig-lash-right-acc2" d="M 3.5 -4.5 L 5.5 -8.0" stroke="#2B1422" stroke-width="1.3" stroke-linecap="round" />
+                <!-- Tuner Crosshair & Bounding Outline -->
+                <circle id="tuner-crosshair-right" class="tuner-crosshair" cx="0" cy="0" r="1.8" />
+                <rect id="tuner-bbox-right" class="tuner-bbox" x="-9.5" y="-10.2" width="19" height="20.4" />
               </g>
 
-              <!-- Starry Eyes Sparkles -->
+              <!-- Starry Eyes Sparkles (Dynamic Centers) -->
               <g class="expr-star-eyes" id="rig-star-eyes-group">
-                <path id="rig-star-eye-left" d="M 29.5 42.5 Q 29.5 48 35.0 48 Q 29.5 48 29.5 53.5 Q 29.5 48 24.0 48 Q 29.5 48 29.5 42.5 Z" fill="#FFF9A6" stroke="#FF9D00" stroke-width="0.45" />
-                <path id="rig-star-eye-right" d="M 64.5 42.5 Q 64.5 48 70.0 48 Q 64.5 48 64.5 53.5 Q 64.5 48 59.0 48 Q 64.5 48 64.5 42.5 Z" fill="#FFF9A6" stroke="#FF9D00" stroke-width="0.45" />
+                <g id="rig-star-eye-left" transform="translate(29.5, 48.5)">
+                  <path d="M 0 -5.5 Q 0 0 5.5 0 Q 0 0 0 5.5 Q 0 0 -5.5 0 Q 0 0 0 -5.5 Z" fill="#FFF9A6" stroke="#FF9D00" stroke-width="0.45" />
+                </g>
+                <g id="rig-star-eye-right" transform="translate(64.5, 48.5)">
+                  <path d="M 0 -5.5 Q 0 0 5.5 0 Q 0 0 0 5.5 Q 0 0 -5.5 0 Q 0 0 0 -5.5 Z" fill="#FFF9A6" stroke="#FF9D00" stroke-width="0.45" />
+                </g>
               </g>
             </svg>
+
+            <!-- Y2K Retro Speech Bubble (Double-Click Triggered) -->
+            <div id="pony-speech-bubble" class="y2k-speech-bubble" style="display: none;" role="status" aria-live="polite">
+              <span id="speech-bubble-text">Life is a party! 🎉</span>
+              <div class="speech-bubble-tail"></div>
+            </div>
+
+            <!-- Head-Pat Floating Hearts & Sleepy Zzz Particle Anchors -->
+            <div id="headpat-container" class="headpat-container" aria-hidden="true"></div>
+            <div id="sleepy-zzz-container" class="sleepy-zzz-container" aria-hidden="true"></div>
+
+            <!-- Real Mouse Sticker Slapping Surface (Locked 1:1 to Rig Frame) -->
+            <div class="sticker-surface" id="sticker-surface"></div>
           </div>
 
           <!-- Inline SVG Fallback -->
@@ -176,28 +199,9 @@
                 <path d="M262 252 L268 245" stroke="#2B1422" stroke-width="3.5" stroke-linecap="round" />
                 <path d="M252 245 L256 237" stroke="#2B1422" stroke-width="3.5" stroke-linecap="round" />
               </g>
-
-              <g id="svg-closed-eyes" style="display: none;">
-                <path d="M138 275 Q160 255 182 275" fill="none" stroke="#2B1422" stroke-width="5" stroke-linecap="round" />
-                <path d="M138 275 L132 268" stroke="#2B1422" stroke-width="3.5" stroke-linecap="round" />
-                <path d="M148 266 L145 258" stroke="#2B1422" stroke-width="3.5" stroke-linecap="round" />
-                <path d="M218 275 Q240 255 262 275" fill="none" stroke="#2B1422" stroke-width="5" stroke-linecap="round" />
-                <path d="M262 275 L268 268" stroke="#2B1422" stroke-width="3.5" stroke-linecap="round" />
-                <path d="M252 266 L255 258" stroke="#2B1422" stroke-width="3.5" stroke-linecap="round" />
-              </g>
-
-              <g class="svg-front-mane">
-                <circle cx="150" cy="180" r="45" fill="url(#maneGrad)" stroke="#A00050" stroke-width="4.5" />
-                <circle cx="220" cy="160" r="55" fill="url(#maneGrad)" stroke="#A00050" stroke-width="4.5" />
-                <circle cx="260" cy="195" r="40" fill="url(#maneGrad)" stroke="#A00050" stroke-width="4.5" />
-                <circle cx="185" cy="210" r="38" fill="url(#maneGrad)" stroke="#A00050" stroke-width="4.5" />
-              </g>
             </svg>
           </div>
         </div>
-
-        <!-- Real Mouse Sticker Slapping Surface -->
-        <div class="sticker-surface" id="sticker-surface"></div>
 
       </div>
     </div>
@@ -205,6 +209,72 @@
 
   <!-- LAYER 4: Retro Windows 95/98 Cascade Pop-up Container -->
   <div class="retro-window-overlay" id="window-overlay" aria-live="polite"></div>
+
+  <!-- Task 3: Built-In Visual Eye Rig Tuner Panel (Ctrl + E) -->
+  <div class="eye-rig-tuner" id="eye-rig-tuner" style="display: none;" role="dialog" aria-label="Eye Rig Tuner">
+    <div class="retro-window-titlebar titlebar-tuner" id="eye-rig-tuner-titlebar">
+      <div class="retro-title-text">
+        <span class="retro-title-icon">🔧</span>
+        <span>Eye_Rig_Tuner.exe [Ctrl+E]</span>
+      </div>
+      <div class="retro-title-actions">
+        <button type="button" class="retro-close-btn" id="btn-tuner-close" aria-label="Close Tuner">×</button>
+      </div>
+    </div>
+    <div class="tuner-window-body">
+      <div class="tuner-row">
+        <label for="tuner-char-select">Pony:</label>
+        <select id="tuner-char-select" class="tuner-select"></select>
+        <label for="tuner-pose-select">Pose:</label>
+        <select id="tuner-pose-select" class="tuner-select"></select>
+      </div>
+
+      <fieldset class="tuner-group">
+        <legend>Left Eye (cx, cy, rx, ry, rot)</legend>
+        <div class="tuner-grid">
+          <div><label>cx: <span id="val-left-cx">30</span></label><input type="range" id="input-left-cx" min="0" max="100" step="0.5"></div>
+          <div><label>cy: <span id="val-left-cy">48</span></label><input type="range" id="input-left-cy" min="0" max="100" step="0.5"></div>
+          <div><label>rx: <span id="val-left-rx">9.5</span></label><input type="range" id="input-left-rx" min="1" max="25" step="0.5"></div>
+          <div><label>ry: <span id="val-left-ry">10.2</span></label><input type="range" id="input-left-ry" min="1" max="25" step="0.5"></div>
+          <div><label>rot: <span id="val-left-rot">0°</span></label><input type="range" id="input-left-rot" min="-60" max="60" step="1"></div>
+          <div class="tuner-check-line"><input type="checkbox" id="chk-left-hide"><label for="chk-left-hide">Hide Left Eye (Profile)</label></div>
+        </div>
+      </fieldset>
+
+      <fieldset class="tuner-group">
+        <legend>Right Eye (cx, cy, rx, ry, rot)</legend>
+        <div class="tuner-grid">
+          <div><label>cx: <span id="val-right-cx">65</span></label><input type="range" id="input-right-cx" min="0" max="100" step="0.5"></div>
+          <div><label>cy: <span id="val-right-cy">48</span></label><input type="range" id="input-right-cy" min="0" max="100" step="0.5"></div>
+          <div><label>rx: <span id="val-right-rx">9.5</span></label><input type="range" id="input-right-rx" min="1" max="25" step="0.5"></div>
+          <div><label>ry: <span id="val-right-ry">10.2</span></label><input type="range" id="input-right-ry" min="1" max="25" step="0.5"></div>
+          <div><label>rot: <span id="val-right-rot">0°</span></label><input type="range" id="input-right-rot" min="-60" max="60" step="1"></div>
+          <div class="tuner-check-line"><input type="checkbox" id="chk-right-hide"><label for="chk-right-hide">Hide Right Eye (Profile)</label></div>
+        </div>
+      </fieldset>
+
+      <fieldset class="tuner-group">
+        <legend>Colors & Pose Offset</legend>
+        <div class="tuner-row">
+          <label>Coat Color:</label>
+          <input type="color" id="input-coat-color" value="#F6B2D1">
+          <input type="text" id="text-coat-color" class="tuner-text" value="#F6B2D1" size="8">
+        </div>
+        <div class="tuner-row">
+          <label>Scale: <span id="val-pose-scale">1.0</span></label>
+          <input type="range" id="input-pose-scale" min="0.5" max="1.5" step="0.05" value="1.0">
+          <label>Offset Y: <span id="val-pose-offset">0px</span></label>
+          <input type="range" id="input-pose-offset" min="-120" max="120" step="2" value="0">
+        </div>
+      </fieldset>
+
+      <div class="tuner-actions">
+        <button type="button" id="btn-tuner-copy" class="tuner-btn">📋 Copy JSON Config</button>
+        <span class="tuner-hint">Tip: Drag eye crosshairs on screen!</span>
+      </div>
+    </div>
+  </div>
+  <div id="tuner-toast" class="tuner-toast">Copied eyeRig JSON to clipboard!</div>
 
   <!-- Milestone 2: Compact Toggleable Winamp Audio Visualizer -->
   <aside class="winamp-visualizer" id="winamp-visualizer" aria-label="Audio Visualizer">
@@ -277,6 +347,24 @@
         <span>Uptime: Active</span>
       </div>
     </div>
+    <div class="taskmgr-content" id="taskmgr-ponies-view" style="display: none;">
+      <div class="taskmgr-section-title">
+        <span>Active Pony Processes</span>
+        <span>6 Running</span>
+      </div>
+      <div class="taskmgr-proc-list">
+        <div class="taskmgr-proc-row"><span>🎈 PinkieParty_32.dll</span><span>100% JOY</span></div>
+        <div class="taskmgr-proc-row"><span>🔮 Twilight_Magic.sys</span><span>128 KB ARC</span></div>
+        <div class="taskmgr-proc-row"><span>⚡ Rainboom_Core.exe</span><span>+20% COOL</span></div>
+        <div class="taskmgr-proc-row"><span>🌸 Kindness_Svc.exe</span><span>0.1 dB</span></div>
+        <div class="taskmgr-proc-row"><span>💎 Couture_Render.dll</span><span>FABULOUS</span></div>
+        <div class="taskmgr-proc-row"><span>🍎 AppleHarvest.bat</span><span>HONEST</span></div>
+      </div>
+      <div class="taskmgr-statusbar">
+        <span>Mane 6 Harmony: 100%</span>
+        <span>CPU: Balanced</span>
+      </div>
+    </div>
   </div>
 
   <!-- Milestone 4: Daily Y2K Productivity Widgets -->
@@ -325,105 +413,119 @@
   <!-- Big Reset Celebration Particle Burst -->
   <div id="reset-burst-container" class="reset-burst-container" aria-hidden="true"></div>
 
-  <!-- FLOATING LIVE WALLPAPER CONTROLS (Bottom-Right) -->
+  <!-- Task 4: Taskbar-Safe, Draggable & Collapsible Control Dock (Bottom-Right) -->
   <aside class="wallpaper-controls" id="wallpaper-controls" aria-label="Wallpaper Controls">
-    <!-- Mane 6 Stage Switcher Dock -->
-    <div class="pony-switcher-dock" id="pony-switcher-dock" role="toolbar" aria-label="Mane 6 Roster Switcher">
-      <button type="button" class="pony-dock-btn active" data-pony="pinkie" title="Switch to Pinkie Pie" aria-label="Pinkie Pie">
-        <img src="assets/cm-pinkie.png" alt="Pinkie Pie Cutie Mark">
+    <!-- Drag Handle (Double-click resets position) -->
+    <div class="dock-drag-handle" id="dock-drag-handle" title="Drag to reposition (Double-click to reset)" aria-label="Drag Handle">⋮⋮</div>
+
+    <!-- Collapsible Dock Main Content -->
+    <div class="dock-content-wrapper" id="dock-content-wrapper">
+      <!-- Mane 6 Stage Switcher Dock -->
+      <div class="pony-switcher-dock" id="pony-switcher-dock" role="toolbar" aria-label="Mane 6 Roster Switcher">
+        <button type="button" class="pony-dock-btn active" data-pony="pinkie" title="Switch to Pinkie Pie" aria-label="Pinkie Pie">
+          <img src="assets/cm-pinkie.png" alt="Pinkie Pie Cutie Mark">
+        </button>
+        <button type="button" class="pony-dock-btn" data-pony="twilight" title="Switch to Twilight Sparkle" aria-label="Twilight Sparkle">
+          <img src="assets/cm-twilight.png" alt="Twilight Sparkle Cutie Mark">
+        </button>
+        <button type="button" class="pony-dock-btn" data-pony="rainbow" title="Switch to Rainbow Dash" aria-label="Rainbow Dash">
+          <img src="assets/cm-rainbow.png" alt="Rainbow Dash Cutie Mark">
+        </button>
+        <button type="button" class="pony-dock-btn" data-pony="fluttershy" title="Switch to Fluttershy" aria-label="Fluttershy">
+          <img src="assets/cm-fluttershy.png" alt="Fluttershy Cutie Mark">
+        </button>
+        <button type="button" class="pony-dock-btn" data-pony="rarity" title="Switch to Rarity" aria-label="Rarity">
+          <img src="assets/cm-rarity.png" alt="Rarity Cutie Mark">
+        </button>
+        <button type="button" class="pony-dock-btn" data-pony="applejack" title="Switch to Applejack" aria-label="Applejack">
+          <img src="assets/cm-applejack.png" alt="Applejack Cutie Mark">
+        </button>
+      </div>
+
+      <!-- Pose Switcher Button -->
+      <button type="button" id="btn-pose-switch" class="ctrl-btn" title="Cycle Character Pose (Pose 1 / 2 / 3)" aria-label="Cycle Pose">
+        <span id="pose-icon-text" style="font-size: 13px; font-weight: bold;">🎭</span>
       </button>
-      <button type="button" class="pony-dock-btn" data-pony="twilight" title="Switch to Twilight Sparkle" aria-label="Twilight Sparkle">
-        <img src="assets/cm-twilight.png" alt="Twilight Sparkle Cutie Mark">
+
+      <!-- Mode Toggle (Party vs Chill Mode) -->
+      <button type="button" id="btn-mode-toggle" class="ctrl-btn" title="Toggle Mode: Party Mode / Chill Work Mode" aria-label="Toggle Party or Chill Mode">
+        <svg id="icon-mode-party" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="currentColor" opacity="0.3"/>
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+        </svg>
+        <svg id="icon-mode-chill" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;" aria-hidden="true">
+          <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
+          <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
+          <line x1="6" y1="1" x2="6" y2="4"></line>
+          <line x1="10" y1="1" x2="10" y2="4"></line>
+          <line x1="14" y1="1" x2="14" y2="4"></line>
+        </svg>
       </button>
-      <button type="button" class="pony-dock-btn" data-pony="rainbow" title="Switch to Rainbow Dash" aria-label="Rainbow Dash">
-        <img src="assets/cm-rainbow.png" alt="Rainbow Dash Cutie Mark">
+      <span class="mode-badge" id="mode-badge">Chill</span>
+
+      <!-- Toggle Task Manager Button -->
+      <button type="button" id="btn-taskmgr-toggle" class="ctrl-btn" title="Toggle Ponyville Task Manager" aria-label="Toggle Task Manager">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+          <line x1="8" y1="21" x2="16" y2="21"/>
+          <line x1="12" y1="17" x2="12" y2="21"/>
+          <polyline points="6 10 9 7 13 13 18 8"/>
+        </svg>
       </button>
-      <button type="button" class="pony-dock-btn" data-pony="fluttershy" title="Switch to Fluttershy" aria-label="Fluttershy">
-        <img src="assets/cm-fluttershy.png" alt="Fluttershy Cutie Mark">
+
+      <!-- Toggle Daily Widgets Button -->
+      <button type="button" id="btn-widgets-toggle" class="ctrl-btn" title="Toggle Clock & To-Do Widgets" aria-label="Toggle Productivity Widgets">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+          <line x1="16" y1="2" x2="16" y2="6"/>
+          <line x1="8" y1="2" x2="8" y2="6"/>
+          <line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
       </button>
-      <button type="button" class="pony-dock-btn" data-pony="rarity" title="Switch to Rarity" aria-label="Rarity">
-        <img src="assets/cm-rarity.png" alt="Rarity Cutie Mark">
+
+      <!-- Toggle Winamp Visualizer Button -->
+      <button type="button" id="btn-visualizer-toggle" class="ctrl-btn" title="Toggle Winamp Visualizer" aria-label="Toggle Audio Visualizer">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="12" y1="20" x2="12" y2="10"/>
+          <line x1="18" y1="20" x2="18" y2="4"/>
+          <line x1="6" y1="20" x2="6" y2="16"/>
+        </svg>
       </button>
-      <button type="button" class="pony-dock-btn" data-pony="applejack" title="Switch to Applejack" aria-label="Applejack">
-        <img src="assets/cm-applejack.png" alt="Applejack Cutie Mark">
+
+      <!-- Mane 6 Party Guest Summon Button -->
+      <button type="button" id="btn-party-guest" class="ctrl-btn" title="Summon Mane 6 Party Guest & Special Effect" aria-label="Party Guest">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+      </button>
+
+      <!-- Mute/Unmute SFX Button -->
+      <button type="button" id="btn-sound-toggle" class="ctrl-btn" title="Toggle Sound FX (Mute/Unmute)" aria-label="Toggle Sound">
+        <svg id="icon-sound-on" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"/>
+          <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+        </svg>
+        <svg id="icon-sound-off" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;" aria-hidden="true">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"/>
+          <line x1="23" y1="9" x2="17" y2="15"/>
+          <line x1="17" y1="9" x2="23" y2="15"/>
+        </svg>
+      </button>
+
+      <!-- Manual Reset (Party Cannon) Button -->
+      <button type="button" id="btn-manual-reset" class="ctrl-btn" title="Party Cannon Reset: Blast Stickers and Windows" aria-label="Party Cannon Reset">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="1 4 1 10 7 10"/>
+          <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+        </svg>
       </button>
     </div>
 
-    <!-- Mode Toggle (Party vs Chill Mode) -->
-    <button type="button" id="btn-mode-toggle" class="ctrl-btn" title="Toggle Mode: Party Mode / Chill Work Mode" aria-label="Toggle Party or Chill Mode">
-      <svg id="icon-mode-party" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="currentColor" opacity="0.3"/>
-        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-      </svg>
-      <svg id="icon-mode-chill" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;" aria-hidden="true">
-        <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
-        <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
-        <line x1="6" y1="1" x2="6" y2="4"></line>
-        <line x1="10" y1="1" x2="10" y2="4"></line>
-        <line x1="14" y1="1" x2="14" y2="4"></line>
-      </svg>
-    </button>
-    <span class="mode-badge" id="mode-badge">Chill</span>
-
-    <!-- Toggle Task Manager Button -->
-    <button type="button" id="btn-taskmgr-toggle" class="ctrl-btn" title="Toggle Ponyville Task Manager" aria-label="Toggle Task Manager">
-      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
-        <line x1="8" y1="21" x2="16" y2="21"/>
-        <line x1="12" y1="17" x2="12" y2="21"/>
-        <polyline points="6 10 9 7 13 13 18 8"/>
-      </svg>
-    </button>
-
-    <!-- Toggle Daily Widgets Button -->
-    <button type="button" id="btn-widgets-toggle" class="ctrl-btn" title="Toggle Clock & To-Do Widgets" aria-label="Toggle Productivity Widgets">
-      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-        <line x1="16" y1="2" x2="16" y2="6"/>
-        <line x1="8" y1="2" x2="8" y2="6"/>
-        <line x1="3" y1="10" x2="21" y2="10"/>
-      </svg>
-    </button>
-
-    <!-- Toggle Winamp Visualizer Button -->
-    <button type="button" id="btn-visualizer-toggle" class="ctrl-btn" title="Toggle Winamp Visualizer" aria-label="Toggle Audio Visualizer">
-      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <line x1="12" y1="20" x2="12" y2="10"/>
-        <line x1="18" y1="20" x2="18" y2="4"/>
-        <line x1="6" y1="20" x2="6" y2="16"/>
-      </svg>
-    </button>
-
-    <!-- Mane 6 Party Guest Summon Button -->
-    <button type="button" id="btn-party-guest" class="ctrl-btn" title="Summon Mane 6 Party Guest & Special Effect" aria-label="Party Guest">
-      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <circle cx="12" cy="12" r="10"/>
-        <line x1="12" y1="8" x2="12" y2="12"/>
-        <line x1="12" y1="16" x2="12.01" y2="16"/>
-      </svg>
-    </button>
-
-    <!-- Mute/Unmute SFX Button -->
-    <button type="button" id="btn-sound-toggle" class="ctrl-btn" title="Toggle Sound FX (Mute/Unmute)" aria-label="Toggle Sound">
-      <svg id="icon-sound-on" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"/>
-        <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
-        <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
-      </svg>
-      <svg id="icon-sound-off" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;" aria-hidden="true">
-        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"/>
-        <line x1="23" y1="9" x2="17" y2="15"/>
-        <line x1="17" y1="9" x2="23" y2="15"/>
-      </svg>
-    </button>
-
-    <!-- Manual Reset (Party Cannon) Button -->
-    <button type="button" id="btn-manual-reset" class="ctrl-btn" title="Party Cannon Reset: Blast Stickers and Windows" aria-label="Party Cannon Reset">
-      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <polyline points="1 4 1 10 7 10"/>
-        <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
-      </svg>
-    </button>
+    <!-- Collapse / Expand Toggle Button -->
+    <button type="button" id="btn-dock-collapse" class="ctrl-btn dock-collapse-btn" title="Collapse / Expand dock" aria-label="Collapse Dock">❯</button>
   </aside>
 
   <script src="app.js"></script>

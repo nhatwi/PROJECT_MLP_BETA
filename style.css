@@ -453,8 +453,8 @@ html, body {
   display: flex;
   justify-content: center;
   align-items: flex-end;
-  height: clamp(480px, 62vh, 760px);
-  width: clamp(380px, 50vw, 680px);
+  height: clamp(480px, 64vh, 780px);
+  width: clamp(380px, 58vw, 780px);
   margin-bottom: 0;
   pointer-events: auto;
   transform-origin: bottom center;
@@ -530,21 +530,20 @@ html, body {
   display: flex;
   justify-content: center;
   align-items: flex-end;
+  transform-origin: bottom center;
 }
 
 .pinkie-img {
   position: relative;
   display: block;
-  width: auto;
+  width: 100%;
   height: 100%;
-  max-width: 100%;
-  object-fit: contain;
   pointer-events: none;
   filter: drop-shadow(0 14px 26px var(--theme-shadow));
   transition: filter 0.35s ease;
 }
 
-/* Vector Facial Expression Rig & Gaze Tracking */
+/* Vector Facial Expression Rig (Locked 1:1 to Rig Frame) */
 .pinkie-face-rig {
   position: absolute;
   inset: 0;
@@ -552,9 +551,6 @@ html, body {
   height: 100%;
   pointer-events: none;
   z-index: 5;
-  transform: translate3d(var(--parallax-eye-x), var(--parallax-eye-y), 0);
-  transition: transform 0.06s ease-out;
-  will-change: transform;
 }
 
 .coat-patch {
@@ -593,6 +589,161 @@ html, body {
 .pinkie-character.expr-starry .expr-star-eyes,
 .pinkie-character.expr-starry .expr-blush {
   opacity: 1;
+}
+
+/* 5. Sleepy Emotional State (Inactivity / Chill Mode) */
+.pinkie-character.expr-sleepy .expr-eye-left,
+.pinkie-character.expr-sleepy .expr-eye-right {
+  opacity: 1;
+}
+
+.pinkie-character.expr-sleepy {
+  animation: ponySleepyBreath 3.6s ease-in-out infinite !important;
+}
+
+@keyframes ponySleepyBreath {
+  0%, 100% { transform: translateY(0) scale(1, 0.985); }
+  50% { transform: translateY(-8px) scale(1.01, 1.015); }
+}
+
+.pixel-zzz {
+  position: absolute;
+  font-family: monospace;
+  font-weight: 900;
+  font-size: 16px;
+  color: #9C27B0;
+  text-shadow: 1px 1px 0px #FFF, -1px -1px 0px #FFF;
+  pointer-events: none;
+  animation: zzzFloat 2.6s linear forwards;
+  z-index: 60;
+}
+
+@keyframes zzzFloat {
+  0% { transform: translate(0, 0) scale(0.6); opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 0.9; }
+  100% { transform: translate(45px, -80px) scale(1.3); opacity: 0; }
+}
+
+/* 6. Shy Emotional State (Intense Blush on Head-Petting) */
+.pinkie-character.expr-shy .expr-blush {
+  opacity: 1 !important;
+  transform: scale(1.35);
+  transform-origin: center;
+  filter: drop-shadow(0 0 6px #FF4081);
+}
+
+.pinkie-character.expr-shy .expr-eye-left,
+.pinkie-character.expr-shy .expr-eye-right {
+  opacity: 0.8;
+}
+
+.pinkie-character.expr-shy {
+  animation: ponyShyBounce 0.9s ease-in-out infinite !important;
+}
+
+@keyframes ponyShyBounce {
+  0%, 100% { transform: translateY(0) rotate(1deg) scale(0.98, 0.98); }
+  50% { transform: translateY(-10px) rotate(-1deg) scale(1.02, 1.02); }
+}
+
+.petting-heart {
+  position: absolute;
+  pointer-events: none;
+  z-index: 60;
+  animation: petHeartFloat 1.2s cubic-bezier(0.2, 0.8, 0.4, 1) forwards;
+}
+
+@keyframes petHeartFloat {
+  0% { transform: translate(-50%, -50%) scale(0.3); opacity: 1; }
+  50% { transform: translate(-50%, calc(-50% - 35px)) scale(1.2); opacity: 0.9; }
+  100% { transform: translate(calc(-50% + var(--dx, 0px)), calc(-50% - 70px)) scale(0.6); opacity: 0; }
+}
+
+/* Speech Bubble (Double-Click Triggered) */
+.y2k-speech-bubble {
+  position: absolute;
+  top: 14%;
+  left: 65%;
+  transform: translate(-50%, -100%);
+  background: #FFFFE8;
+  border: 2px solid #2B1422;
+  border-radius: 12px;
+  padding: 8px 14px;
+  box-shadow: 3px 3px 0px rgba(43, 20, 34, 0.4);
+  font-family: var(--font-retro);
+  font-size: 11.5px;
+  font-weight: bold;
+  color: #2B1422;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 60;
+  animation: speechPopIn 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+}
+
+@keyframes speechPopIn {
+  0% { transform: translate(-50%, -80%) scale(0.2); opacity: 0; }
+  80% { transform: translate(-50%, -105%) scale(1.08); opacity: 1; }
+  100% { transform: translate(-50%, -100%) scale(1); opacity: 1; }
+}
+
+.speech-bubble-tail {
+  position: absolute;
+  bottom: -9px;
+  left: 20px;
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 9px solid #2B1422;
+}
+
+.speech-bubble-tail::after {
+  content: "";
+  position: absolute;
+  bottom: 2px;
+  left: -6px;
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 7px solid #FFFFE8;
+}
+
+/* Tuner Overlay Elements */
+body.tuner-mode-active .sticker-surface {
+  pointer-events: none !important;
+}
+
+body.tuner-mode-active .pinkie-face-rig {
+  pointer-events: auto !important;
+  z-index: 65;
+}
+
+body.tuner-mode-active .expr-eye-left,
+body.tuner-mode-active .expr-eye-right {
+  opacity: 0.88 !important;
+  pointer-events: auto !important;
+  cursor: grab;
+}
+
+body.tuner-mode-active .tuner-crosshair {
+  display: block;
+  fill: #FF0055;
+  stroke: #FFFFFF;
+  stroke-width: 0.6;
+}
+
+body.tuner-mode-active .tuner-bbox {
+  display: block;
+  fill: rgba(255, 0, 85, 0.08);
+  stroke: #FF0055;
+  stroke-width: 0.6;
+  stroke-dasharray: 2, 2;
+}
+
+.tuner-crosshair, .tuner-bbox {
+  display: none;
 }
 
 /* SVG Fallback Node */
@@ -1250,6 +1401,23 @@ html, body {
   justify-content: space-between;
 }
 
+.taskmgr-proc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.taskmgr-proc-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10.5px;
+  padding: 3px 6px;
+  background: #F4F6F8;
+  border: 1px solid #DFDFDF;
+  font-family: "Consolas", monospace;
+}
+
 /* ==========================================================================
    Milestone 3: Mane 6 Fullscreen Signature Screen Effects
    ========================================================================== */
@@ -1888,34 +2056,79 @@ body.chill-mode .mode-badge {
 }
 
 /* ==========================================================================
-   Minimalist Floating Live Wallpaper Controls (Bottom-Right)
+   Task 4: Taskbar-Safe, Draggable & Collapsible Control Dock
    ========================================================================== */
 
 .wallpaper-controls {
   position: fixed;
-  bottom: 20px;
-  right: 22px;
+  bottom: 76px;
+  right: 24px;
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 5px 10px;
-  background: rgba(255, 255, 255, 0.82);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 181, 211, 0.7);
+  padding: 5px 8px;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1.5px solid rgba(255, 181, 211, 0.75);
   border-radius: 28px;
-  box-shadow: 0 4px 18px rgba(255, 126, 179, 0.25);
+  box-shadow: 0 6px 24px rgba(255, 126, 179, 0.35);
   z-index: 900;
-  opacity: 0.28;
+  opacity: 0.78;
   transition: opacity 0.35s ease, transform 0.2s ease, box-shadow 0.35s ease;
   pointer-events: auto;
+  user-select: none;
+  touch-action: none;
 }
 
 .wallpaper-controls:hover,
 .wallpaper-controls:focus-within {
   opacity: 1;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 22px rgba(255, 126, 179, 0.45);
+  box-shadow: 0 8px 28px rgba(255, 126, 179, 0.55);
+}
+
+.dock-drag-handle {
+  cursor: grab;
+  padding: 2px 5px;
+  color: #777777;
+  font-size: 14px;
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: -1px;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dock-drag-handle:hover {
+  color: var(--theme-hot, #EF2B85);
+}
+
+.dock-drag-handle:active {
+  cursor: grabbing !important;
+}
+
+.dock-content-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: opacity 0.2s ease;
+}
+
+.wallpaper-controls.is-collapsed .dock-content-wrapper {
+  display: none !important;
+}
+
+.dock-collapse-btn {
+  font-size: 11px;
+  font-weight: bold;
+  color: #777777;
+  transition: transform 0.25s ease, color 0.15s ease;
+}
+
+.wallpaper-controls.is-collapsed .dock-collapse-btn {
+  transform: rotate(180deg);
 }
 
 .ctrl-btn {
@@ -1946,6 +2159,160 @@ body.chill-mode .mode-badge {
 .ctrl-btn.active {
   background: var(--theme-hot, #EF2B85);
   color: #FFFFFF;
+}
+
+/* ==========================================================================
+   Task 3: Built-In Visual Eye Rig Tuner Window (Ctrl + E)
+   ========================================================================== */
+
+.eye-rig-tuner {
+  position: fixed;
+  top: 40px;
+  left: 40px;
+  width: 340px;
+  background: var(--win-bg);
+  border-top: 2px solid var(--win-light);
+  border-left: 2px solid var(--win-light);
+  border-right: 2px solid var(--win-dark);
+  border-bottom: 2px solid var(--win-dark);
+  box-shadow: 4px 6px 26px rgba(0, 0, 0, 0.45);
+  z-index: 10500;
+  padding: 3px;
+  font-family: var(--font-retro);
+  user-select: none;
+  touch-action: none;
+}
+
+.titlebar-tuner {
+  background: linear-gradient(90deg, #000080, #1084D0);
+  color: #FFFFFF;
+  text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.8);
+}
+
+.tuner-window-body {
+  background: #FFFFFF;
+  border-top: 2px solid var(--win-shadow);
+  border-left: 2px solid var(--win-shadow);
+  border-right: 2px solid var(--win-light);
+  border-bottom: 2px solid var(--win-light);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 11px;
+}
+
+.tuner-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tuner-select {
+  flex: 1;
+  font-family: var(--font-retro);
+  font-size: 11px;
+  padding: 2px;
+}
+
+.tuner-group {
+  border: 1px solid var(--win-shadow);
+  padding: 6px 8px;
+  border-radius: 2px;
+}
+
+.tuner-group legend {
+  font-size: 10px;
+  font-weight: bold;
+  color: #333333;
+  padding: 0 4px;
+}
+
+.tuner-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  font-size: 10.5px;
+}
+
+.tuner-grid input[type="range"] {
+  width: 100%;
+  height: 14px;
+  cursor: pointer;
+}
+
+.tuner-check-line {
+  grid-column: span 2;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+}
+
+.tuner-text {
+  font-family: "Consolas", monospace;
+  font-size: 11px;
+  padding: 1px 4px;
+}
+
+.tuner-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+  border-top: 1px solid #E0E0E0;
+  padding-top: 6px;
+}
+
+.tuner-btn {
+  background: var(--win-bg);
+  border-top: 2px solid var(--win-light);
+  border-left: 2px solid var(--win-light);
+  border-right: 2px solid var(--win-dark);
+  border-bottom: 2px solid var(--win-dark);
+  font-family: var(--font-retro);
+  font-size: 11px;
+  font-weight: bold;
+  padding: 4px 10px;
+  cursor: pointer;
+}
+
+.tuner-btn:active {
+  border-top: 2px solid var(--win-dark);
+  border-left: 2px solid var(--win-dark);
+  border-right: 2px solid var(--win-light);
+  border-bottom: 2px solid var(--win-light);
+  padding: 5px 9px 3px 11px;
+}
+
+.tuner-hint {
+  font-size: 9.5px;
+  color: #777777;
+  font-style: italic;
+}
+
+.tuner-toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%) translateY(50px);
+  background: rgba(43, 20, 34, 0.92);
+  color: #FFF9A6;
+  padding: 8px 18px;
+  border-radius: 20px;
+  font-family: var(--font-retro);
+  font-size: 12px;
+  font-weight: bold;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 11000;
+  transition: transform 0.25s cubic-bezier(0.18, 0.89, 0.32, 1.28), opacity 0.25s ease;
+}
+
+.tuner-toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
 }
 
 /* Responsive Scaling for Small Displays */

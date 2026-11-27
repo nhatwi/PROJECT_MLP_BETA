@@ -8,7 +8,8 @@
 
 [CmdletBinding()]
 param (
-    [string]$OutputFile = "PROJECT_MLP.lively"
+    [string]$OutputFile = "PROJECT_MLP.lively",
+    [string]$ZipOutputFile = "PROJECT_MLP.zip"
 )
 
 $ErrorActionPreference = "Stop"
@@ -19,9 +20,10 @@ if (-not $rootPath) {
 }
 
 $finalPackage = Join-Path $rootPath $OutputFile
+$zipPackage = Join-Path $rootPath $ZipOutputFile
 
 Write-Host "==========================================================" -ForegroundColor Magenta
-Write-Host " Pinkie Pie & Mane 6 Y2K Wallpaper - Lively Packager v3.0" -ForegroundColor Cyan
+Write-Host " Pinkie Pie & Mane 6 Y2K Wallpaper - Lively Packager v4.0" -ForegroundColor Cyan
 Write-Host "==========================================================" -ForegroundColor Magenta
 
 # Files and folders to bundle
@@ -43,9 +45,12 @@ foreach ($item in $itemsToBundle) {
     }
 }
 
-# Clean existing package if present
+# Clean existing packages if present
 if (Test-Path $finalPackage) {
     Remove-Item -Path $finalPackage -Force
+}
+if ($ZipOutputFile -and (Test-Path $zipPackage) -and ($zipPackage -ne $finalPackage)) {
+    Remove-Item -Path $zipPackage -Force
 }
 
 Write-Host "[1/3] Staging files for packaging..." -ForegroundColor Yellow
@@ -78,7 +83,11 @@ try {
     Write-Host "[3/3] Package created successfully!" -ForegroundColor Green
     Write-Host "  -> Location: $finalPackage" -ForegroundColor White
     Write-Host "  -> Size: $('{0:N2}' -f $packageSize) MB" -ForegroundColor White
-    Write-Host "`nTo install: Drag and drop '$OutputFile' directly into the Lively Wallpaper application window!" -ForegroundColor Cyan
+    if ($ZipOutputFile -and ($zipPackage -ne $finalPackage)) {
+        Copy-Item -Path $finalPackage -Destination $zipPackage -Force
+        Write-Host "  -> ZIP Copy: $zipPackage" -ForegroundColor White
+    }
+    Write-Host "`nTo install: Drag and drop '$OutputFile' (or import '$ZipOutputFile') directly into Lively Wallpaper!" -ForegroundColor Cyan
 }
 finally {
     if (Test-Path $tempStageDir) {
